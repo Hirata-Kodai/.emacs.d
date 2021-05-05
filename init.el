@@ -22,18 +22,108 @@
 (setq-default tab-width 4)
 (delete-selection-mode t) ; リージョンを削除可能に設定
 
-(bind-key "C-M-<right>" 'switch-to-next-buffer)
-(bind-key "C-M-<left>" 'switch-to-prev-buffer)
 
 (set-fontset-font
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
 (set-face-font 'default "Ricty Diminished-12")
 
+;; iflipb（バッファ切り替え）
+(use-package iflipb
+  :ensure t
+  :config
+  (setq iflipb-ignore-buffers (list "^magit" "^[*]"))
+  (setq iflipb-wrap-around t)
+  (bind-key "C-M-<right>" 'iflipb-next-buffer)
+  (bind-key "C-M-<left>" 'iflipb-previous-buffer))
+
+;; dired
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
 (setq dired-dwim-target t)
-;; ディレクトリを再帰的にコピーする
+;; ディレクトリを再帰的にコピー・削除する
 (setq dired-recursive-copies 'always)
+;; (setq dired-recursive-deletes 'always)
+
+(use-package dired
+  :bind
+    (:map dired-mode-map
+		  ("RET" . dired-open-in-accordance-with-situation)
+		  ("e" . wdired-change-to-wdired-mode))
+  :config
+  ;; hydra-dired
+  (define-key dired-mode-map
+	"."
+	(defhydra hydra-dired (:hint nil :color pink)
+	  "
+       _+_ mkdir   _v_iew         _m_ark         _z_ip     _g_ revert buffer
+       _C_opy      view _o_ther   _U_nmark all   un_Z_ip   _[_ hide detail
+       _D_elete    open _f_ile    _u_nmark       _s_ort    counsel-_T_ramp
+       _R_ename    ch_M_od        _t_oggle       _e_dit    _._togggle hydra
+      "
+	  ("[" dired-hide-details-mode)
+	  ("+" dired-create-directory)
+	  ("RET" dired-open-in-accordance-with-situation :exit t)
+	  ("f" dired-open-in-accordance-with-situation :exit t)
+	  ("C" dired-do-copy)   ;; Copy all marked files
+	  ("D" dired-do-delete)
+	  ("M" dired-do-chmod)
+	  ("m" dired-mark)
+	  ("o" dired-view-file-other-window :exit t)
+	  ("?" dired-summary :exit t)
+	  ("R" dired-do-rename)
+	  ("g" revert-buffer)
+	  ("e" wdired-change-to-wdired-mode :exit t)
+	  ("s" dired-sort-toggle-or-edit)
+	  ("T" counsel-tramp :exit t)
+	  ("t" dired-toggle-marks)
+	  ("U" dired-unmark-all-marks)
+	  ("u" dired-unmark)
+	  ("v" dired-view-file :exit t)
+	  ("z" dired-zip-files)
+	  ("Z" dired-do-compress)
+	  ("q" nil)
+	  ("." nil :color blue)))
+
+
+  ;; View-file-other-window
+  ;; http://y0m0r.hateblo.jp/entry/20120219/1329657774
+  (defun dired-view-file-other-window ()
+	"View-file other window."
+	(interactive)
+	(let ((file (dired-get-file-for-visit)))
+	  (if (file-directory-p file)
+		  (or (and (cdr dired-subdir-alist)
+				   (dired-goto-subdir file))
+			  (dired file))
+		(view-file-other-window file))))
+
+  ;; File are opened in separate buffer, directories are opened in same buffer
+  ;; http://nishikawasasaki.hatenablog.com/entry/20120222/1329932699
+  (defun dired-open-in-accordance-with-situation ()
+	"Files are opened in separate buffers, directories are opened in the same buffer."
+	(interactive)
+	(let ((file (dired-get-filename)))
+	  (if (file-directory-p file)
+		  (dired-find-alternate-file)
+		(dired-find-file))))
+  (defun dired-zip-files (zip-file)
+	"Create an archive containing the marked files."
+	(interactive "sEnter name of zip file: ")
+	;; create the zip file
+	(let ((zip-file (if (string-match ".zip$" zip-file) zip-file (concat zip-file ".zip"))))
+	  (shell-command
+	   (concat "zip "
+			   zip-file
+			   " "
+			   (concat-string-list
+				(mapcar
+				 '(lambda (filename)
+					(file-name-nondirectory filename))
+				 (dired-get-marked-files)))))))
+  (defun concat-string-list (list)
+   "Return a string which is a concatenation of all elements of the list separated by spaces"
+   (mapconcat '(lambda (obj) (format "%s" obj)) list " "))
+  )
 
 ;; バックアップファイルを一箇所に
 (setq backup-directory-alist '(("^.*(?<!org)$" . "~/.emacs.d/backupfiles/")))
@@ -46,6 +136,9 @@
 (global-set-key [zenkaku-hankaku] #'toggle-input-method)
 (global-unset-key "\C-\\")
 
+;; magit-status
+(global-set-key (kbd "C-c g") 'magit-status)
+
 ;;ivy
 (use-package ivy
   :ensure t
@@ -55,6 +148,7 @@
   ("M-x" . counsel-M-x)
   ("C-x C-f" . counsel-find-file)
   ("C-x C-r" . counsel-recentf)
+  ("C-x t" . counsel-tramp)
   :bind*
   ("C-c C-r" . ivy-resume)
   :config
@@ -220,8 +314,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq my-org-directory "/mnt/c/Users/fight/GoogleDrive/org/")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
-		 ("C-c a" . org-agenda)
-		 ("C-c j" . open-junk-file))
+		 ("C-c a" . org-agenda))
   :config
   (setq org-capture-templates
       '(
@@ -282,7 +375,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; (use-package ox-bibtex)
 (use-package open-junk-file
   :bind ("C-c j" . open-junk-file)
-  :config (setq open-junk-file-format "/mnt/c/Users/fight/GoogleDrive/org/junk/%Y-%m%d-memo.org"))
+  :config
+  (setq open-junk-file-format "/mnt/c/Users/fight/GoogleDrive/org/junk/%Y-%m%d-memo.org")
+  ;; (setq open-junk-file-find-file-function 'find-file)  ;; custom経由で設定
+  )
 
 ;; yasnippet
 (use-package yasnippet
@@ -341,15 +437,18 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (electric-pair-mode 1)
 
 
-;; ウィンドウを透明にする
+;; ウィンドウを透明にする(できてない)
+;; (add-to-list 'load-path "~/.emacs.d/elpa/cycle-frame-transparency/")
+;; (require 'cycle-frame-transparency)
+;; (setq cft--trasparent 20)
 ;; アクティブウィンドウ／非アクティブウィンドウ（alphaの値で透明度を指定）
-(add-to-list 'default-frame-alist '(alpha . (0.85 0.85)))
+;; (add-to-list 'default-frame-alist '(alpha . (0.85 0.85)))
 
 ;; メニューバーを消す
-;;(menu-bar-mode -1)
+;; (menu-bar-mode -1)
 
 ;; ツールバーを消す
-;;(tool-bar-mode -1)
+(tool-bar-mode -1)
 
 ;; 列数を表示する
 (column-number-mode t)
@@ -362,7 +461,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (if (boundp 'window-system)
   (setq default-frame-alist
     (append (list
-      '(top . 0) ;ウィンドウの表示位置(Y座標)
+      '(top . 20) ;ウィンドウの表示位置(Y座標)
       '(left . 0) ;ウィンドウの表示位置(X座標）
       '(width . 70) ;ウィンドウ幅
       '(height . 15) ;ウィンドウ高
@@ -659,9 +758,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(custom-safe-themes
    (quote
 	("28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default)))
+ '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
+ '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
+ '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
