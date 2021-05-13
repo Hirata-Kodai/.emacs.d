@@ -28,6 +28,14 @@
     (font-spec :family "Ricty Diminished"))
 (set-face-font 'default "Ricty Diminished-12")
 
+;; ブラウザの設定
+(let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+      (cmd-args '("/c" "start")))
+    (when (file-exists-p cmd-exe)
+      (setq browse-url-generic-program  cmd-exe
+            browse-url-generic-args     cmd-args
+            browse-url-browser-function 'browse-url-generic)))
+
 ;; iflipb（バッファ切り替え）
 (use-package iflipb
   :ensure t
@@ -125,9 +133,8 @@
    (mapconcat '(lambda (obj) (format "%s" obj)) list " "))
   )
 
-;; バックアップファイルを一箇所に
-(setq backup-directory-alist '(("^.*(?<!org)$" . "~/.emacs.d/backupfiles/")))
-(setq backup-directory-alist '(("*.org" . "~/.emacs.d/backupfiles/org/")))
+;;; バックアップファイルを作らない
+(setq make-backup-files nil)
 
 ;;; mozc
 (use-package mozc)                                 ; mozcの読み込み
@@ -171,9 +178,9 @@
     (deactivate-mark)
     (swiper (buffer-substring-no-properties
 	     (region-beginning) (region-end)))))
- (global-set-key (kbd "C-s") 'swiper-region))
-
-
+  (global-set-key (kbd "C-s") 'swiper-region)
+  
+;; ~/から始まるように
 (defun ad:counsel-recentf ()
    "Find a file on `recentf-list'."
    (interactive)
@@ -189,6 +196,41 @@
 			 :require-match t
 			 :caller 'counsel-recentf))
 (advice-add 'counsel-recentf :override #'ad:counsel-recentf)
+
+:config
+    ;; using ivy-format-fuction-arrow with counsel-yank-pop
+    (advice-add
+    'counsel--yank-pop-format-function
+    :override
+    (lambda (cand-pairs)
+      (ivy--format-function-generic
+       (lambda (str)
+         (mapconcat
+          (lambda (s)
+            (ivy--add-face (concat (propertize "┃ " 'face `(:foreground "#61bfff")) s) 'ivy-current-match))
+          (split-string
+           (counsel--yank-pop-truncate str) "\n" t)
+          "\n"))
+       (lambda (str)
+         (counsel--yank-pop-truncate str))
+       cand-pairs
+       counsel-yank-pop-separator)))
+
+    ;; NOTE: this variable do not work if defined in :custom
+    (setq ivy-format-function 'ivy-format-function-pretty)
+    (setq counsel-yank-pop-separator
+        (propertize "\n────────────────────────────────────────────────────────\n"
+               'face `(:foreground "#6272a4")))
+  )
+
+;; ivyのプロンプトにアイコンを表示
+(with-eval-after-load "ivy"
+  (defun my-pre-prompt-function ()
+    (if window-system
+        (format "%s "
+                (all-the-icons-faicon "linux")) ;; ""
+      (format "%s\n" (make-string (1- (frame-width)) ?\x2D))))
+  (setq ivy-pre-prompt-function #'my-pre-prompt-function))
 
 ;; all-the-icons
 (use-package all-the-icons)
@@ -210,67 +252,62 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 	  (unless (symbolp icon)
 		icon)))
   (all-the-icons-ivy-setup)
+
+  ;; ivyのカーソル設定
   (defface my-ivy-arrow-visible
   '((((class color) (background light)) :foreground "orange")
     (((class color) (background dark)) :foreground "#EE6363"))
   "Face used by Ivy for highlighting the arrow.")
 
-(defface my-ivy-arrow-invisible
-  '((((class color) (background light)) :foreground "#ededed")
-    (((class color) (background(defface my-ivy-arrow-invisible
-  '((((class color) (background light)) :foreground "#ededed")
-    (((class color) (background dark)) :foreground "#31343F"))
-  "Face used by Ivy for highlighting the invisible arrow.") dark)) :foreground "#31343F"))
-  "Face used by Ivy for highlighting the invisible arrow.")
+  (defface my-ivy-arrow-invisible
+	'((((class color) (background light)) :foreground "#ededed")
+	  (((class color) (background(defface my-ivy-arrow-invisible
+								   '((((class color) (background light)) :foreground "#ededed")
+									 (((class color) (background dark)) :foreground "#31343F"))
+								   "Face used by Ivy for highlighting the invisible arrow.") dark)) :foreground "#31343F"))
+	"Face used by Ivy for highlighting the invisible arrow.")
 
-(if window-system
-    (when (require 'all-the-icons nil t)
-      (defun my-ivy-format-function-arrow (cands)
-        "Transform CANDS into a string for minibuffer."
-        (ivy--format-function-generic
-         (lambda (str)
-           (concat (all-the-icons-faicon
-                    "hand-o-right"
-                    :v-adjust -0.2 :face 'my-ivy-arrow-visible)
-                   " " (ivy--add-face str 'ivy-current-match)))
-         (lambda (str)
-           (concat (all-the-icons-faicon
-                    "hand-o-right" :face 'my-ivy-arrow-invisible) " " str))
-         cands
-         "\n"))
-      (setq ivy-format-functions-alist
-            '((t . my-ivy-format-function-arrow))))
-  (setq ivy-format-functions-alist '((t . ivy-format-function-arrow))))
+  (if window-system
+	  (when (require 'all-the-icons nil t)
+		(defun my-ivy-format-function-arrow (cands)
+		  "Transform CANDS into a string for minibuffer."
+		  (ivy--format-function-generic
+		   (lambda (str)
+			 (concat (all-the-icons-faicon
+					  "hand-o-right"
+					  :v-adjust -0.2 :face 'my-ivy-arrow-visible)
+					 " " (ivy--add-face str 'ivy-current-match)))
+		   (lambda (str)
+			 (concat (all-the-icons-faicon
+					  "hand-o-right" :face 'my-ivy-arrow-invisible) " " str))
+		   cands
+		   "\n"))
+		(setq ivy-format-functions-alist
+			  '((t . my-ivy-format-function-arrow))))
+	(setq ivy-format-functions-alist '((t . ivy-format-function-arrow))))
 
-(custom-set-faces
- '(ivy-current-match
-   ((((class color) (background light))
-     :background "#e0daab" :distant-foreground "#000000")
-    (((class color) (background dark))
-     :background "#404040" :distant-foreground "#abb2bf")))
- '(ivy-minibuffer-match-face-1
-   ((((class color) (background light)) :foreground "#666666")
-    (((class color) (background dark)) :foreground "#999999")))
- '(ivy-minibuffer-match-face-2
-   ((((class color) (background light)) :foreground "#c03333" :underline t)
-    (((class color) (background dark)) :foreground "#e04444" :underline t)))
- '(ivy-minibuffer-match-face-3
-   ((((class color) (background light)) :foreground "#8585ff" :underline t)
-    (((class color) (background dark)) :foreground "#7777ff" :underline t)))
- '(ivy-minibuffer-match-face-4
-   ((((class color) (background light)) :foreground "#439943" :underline t)
-    (((class color) (background dark)) :foreground "#33bb33" :underline t))))
-)
+  ;; ivyのマッチ部分のface
+  (custom-set-faces
+   '(ivy-current-match
+	 ((((class color) (background light))
+	   :background "#e0daab" :distant-foreground "#000000")
+	  (((class color) (background dark))
+	   :background "#404040" :distant-foreground "#abb2bf")))
+   '(ivy-minibuffer-match-face-1
+	 ((((class color) (background light)) :foreground "#666666")
+	  (((class color) (background dark)) :foreground "#999999")))
+   '(ivy-minibuffer-match-face-2
+	 ((((class color) (background light)) :foreground "#c03333" :underline t)
+	  (((class color) (background dark)) :foreground "#e04444" :underline t)))
+   '(ivy-minibuffer-match-face-3
+	 ((((class color) (background light)) :foreground "#8585ff" :underline t)
+	  (((class color) (background dark)) :foreground "#7777ff" :underline t)))
+   '(ivy-minibuffer-match-face-4
+	 ((((class color) (background light)) :foreground "#439943" :underline t)
+	  (((class color) (background dark)) :foreground "#33bb33" :underline t))))
+  )
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
-;; ivyのプロンプトにアイコンを表示
-(with-eval-after-load "ivy"
-  (defun my-pre-prompt-function ()
-    (if window-system
-        (format "%s "
-                (all-the-icons-faicon "linux")) ;; ""
-      (format "%s\n" (make-string (1- (frame-width)) ?\x2D))))
-  (setq ivy-pre-prompt-function #'my-pre-prompt-function))
 
 (use-package ivy-hydra
   :ensure t
@@ -314,7 +351,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq my-org-directory "/mnt/c/Users/fight/GoogleDrive/org/")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
-		 ("C-c a" . org-agenda))
+		 ("C-c a" . org-agenda)
+		 ("C-c l" . org-store-link)
+		 ("C-c C-l" . org-insert-link))
   :config
   (setq org-capture-templates
       '(
@@ -356,7 +395,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-agenda-files '(
              "/mnt/c/Users/fight/GoogleDrive/org/non_Scheduled_Tasks.org"
              "/mnt/c/Users/fight/GoogleDrive/org/Scheduled_Tasks.org"
-             "/mnt/c/Users/fight/GoogleDrive/org/junk/"
+			 "/mnt/c/Users/fight/GoogleDrive/org/memo.org"
+			 "/mnt/c/Users/fight/GoogleDrive/org/yaritai.org"
                          )))
 
 (use-package org-bullets
@@ -566,10 +606,64 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 		(company--insert-candidate2 company-common))))
 
   (define-key company-active-map [tab] 'company-complete-common2)
-  (define-key company-active-map [backtab] 'company-select-previous))
+  (define-key company-active-map [backtab] 'company-select-previous)
+  ;; comapny-box(まだアイコンが一種類しかでない、背景がおかしい)
+;;   (use-package company-box
+;;     :diminish
+;;     :hook (company-mode . company-box-mode)
+;;     :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+;;     :config
+;;     ;; (setq company-box-backends-colors nil)
+;;     ;; (setq company-box-show-single-candidate t)
+;;     (setq company-box-max-candidates 50)
+
+;;     (defun company-box-icons--elisp (candidate)
+;;       (when (derived-mode-p 'emacs-lisp-mode)
+;;         (let ((sym (intern candidate)))
+;;           (cond ((fboundp sym) 'Function)
+;;                 ((featurep sym) 'Module)
+;;                 ((facep sym) 'Color)
+;;                 ((boundp sym) 'Variable)
+;;                 ((symbolp sym) 'Text)
+;;                 (t . nil)))))
+
+;;     (with-eval-after-load 'all-the-icons
+;;       (declare-function all-the-icons-faicon 'all-the-icons)
+;;       (declare-function all-the-icons-fileicon 'all-the-icons)
+;;       (declare-function all-the-icons-material 'all-the-icons)
+;;       (declare-function all-the-icons-octicon 'all-the-icons)
+;;       (setq company-box-icons-all-the-icons
+;;             `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
+;;               (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
+;;               (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+;;               (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+;;               (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+;;               (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
+;;               (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
+;;               (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+;;               (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
+;;               (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
+;;               (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
+;;               (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
+;;               (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
+;;               (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
+;;               (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
+;;               (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
+;;               (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
+;;               (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
+;;               (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
+;;               (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
+;;               (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
+;;               (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
+;;               (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+;;               (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
+;;               (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
+;;               (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
+;;               (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
+)
 
 
-;; comapny-boxが表示されない
+
 
 ;; (use-package company-box
 ;;   :diminish company-box-mode
