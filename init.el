@@ -169,6 +169,29 @@
   ;;   ;; (interactive "P") ;; 大文字のPだと，C-u C-sてでないと効かない
   ;;   (let (current-prefix-arg)
   ;;     (call-interactively (if use-swiper 'swiper 'isearch-forward))))
+  ;; Toggle migemo and fuzzy by command.
+  
+  ;; (define-key ivy-minibuffer-map (kbd "M-f") #'ivy-migemo-toggle-fuzzy)
+  ;; (define-key ivy-minibuffer-map (kbd "M-i") #'ivy-migemo-toggle-migemo)
+
+  ;; ;; If you want to defaultly use migemo on swiper and counsel-find-file:
+  ;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+  ;; 								(swiper . ivy-migemo--regex-plus)
+  ;; 								(counsel-find-file . ivy-migemo--regex-plus))
+  ;; 										;(counsel-other-function . ivy-migemo--regex-plus)
+  ;; 		)
+
+  ;; (use-package swiper-migemo
+  ;; 	:init
+  ;; 	(add-to-list 'load-path "~/.emacs.d/elpa/swiper-migemo")
+  ;; 	:config
+  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-find-file)
+  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-recentf)
+  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-rg)
+  ;; 	(setq migemo-options '("--quiet" "--nonewline" "--emacs"))
+  ;; 	(migemo-kill)
+  ;; 	(migemo-init)
+  ;; 	(global-swiper-migemo-mode +1))
   
   (defun swiper-region ()
   "If region is selected `swiper' with the keyword selected in region. If the region isn't selected `swiper'."
@@ -330,6 +353,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (setq ivy-re-builders-alist '((t . ivy--regex-plus)
                               (swiper . my:ivy-migemo-re-builder)))
+
+;; If you want to defaultly use migemo on swiper and counsel-find-file:
+;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
+;;                               (swiper . ivy-migemo--regex-plus)
+;;                               (counsel-find-file . ivy-migemo--regex-plus))
+;;                               ;(counsel-other-function . ivy-migemo--regex-plus)
+;;                               )
 
 ;;migemo
 (use-package migemo
@@ -857,7 +887,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
