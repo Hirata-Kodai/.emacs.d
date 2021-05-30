@@ -21,6 +21,7 @@
 (prefer-coding-system 'utf-8)
 (setq-default tab-width 4)
 (delete-selection-mode t) ; リージョンを削除可能に設定
+(setq show-help-function nil) ; help文を非表示
 
 
 (set-fontset-font
