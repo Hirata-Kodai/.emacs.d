@@ -67,12 +67,13 @@
        _+_ mkdir   _v_iew         _m_ark         _z_ip     _g_ revert buffer
        _C_opy      view _o_ther   _U_nmark all   un_Z_ip   _[_ hide detail
        _D_elete    open _f_ile    _u_nmark       _s_ort    counsel-_T_ramp
-       _R_ename    ch_M_od        _t_oggle       _e_dit    _._togggle hydra
+       _R_ename    _b_ack dir     ch_M_od        _e_dit    _._togggle hydra
       "
 	  ("[" dired-hide-details-mode)
 	  ("+" dired-create-directory)
 	  ("RET" dired-open-in-accordance-with-situation :exit t)
 	  ("f" dired-open-in-accordance-with-situation :exit t)
+	  ("b" dired-up-alternate-directory)
 	  ("C" dired-do-copy)   ;; Copy all marked files
 	  ("D" dired-do-delete)
 	  ("M" dired-do-chmod)
@@ -115,6 +116,19 @@
 	  (if (file-directory-p file)
 		  (dired-find-alternate-file)
 		(dired-find-file))))
+  ;; Move to higher directory without make new buffer
+  (defun dired-up-alternate-directory ()
+	"Move to higher directory without make new buffer."
+   (interactive)
+   (let* ((dir (dired-current-directory))
+          (up (file-name-directory (directory-file-name dir))))
+     (or (dired-goto-file (directory-file-name dir))
+         ;; Only try dired-goto-subdir if buffer has more than one dir.
+         (and (cdr dired-subdir-alist)
+              (dired-goto-subdir up))
+         (progn
+           (find-alternate-file up)
+           (dired-goto-file dir)))))
   (defun dired-zip-files (zip-file)
 	"Create an archive containing the marked files."
 	(interactive "sEnter name of zip file: ")
@@ -433,14 +447,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package org-bullets
   :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(defun org-mode-reftex-setup ()
-  (load-library "reftex")
-  (and (buffer-file-name)
-       (file-exists-p (buffer-file-name))
-       (reftex-parse-all))
-  (define-key org-mode-map (kbd "C-c )") 'reftex-citation)
-  )
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
 
 ;;htmlなどにエクスポートするとき
 ;; (use-package ox-bibtex)
@@ -457,7 +463,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :init (yas-global-mode)
   :config
   (setq yas-snippet-dirs
-    '("~/.emacs.d/snippets")))
+		'("~/.emacs.d/snippets"
+		  "~/.emacs.d/elpa/yasnippet-snippets-20210408.1234/snippets/")))
 
 (use-package ivy-yasnippet
   :ensure t
@@ -741,6 +748,39 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package ox-latex)
 (setq org-latex-with-hyperref nil)
 
+;; reftex
+(defun org-mode-reftex-setup ()
+  (load-library "reftex")
+  (and (buffer-file-name)
+       (file-exists-p (buffer-file-name))
+       (reftex-parse-all))
+  (define-key org-mode-map (kbd "C-c [") 'reftex-citation)
+  )
+(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+(setq reftex-default-bibliography '("~/texmf/pbibtex/bib/papers.bib"))
+
+;; yatex
+(use-package yatex
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tex\\'" . yatex-mode)) ;;auto-mode-alistへの追加
+  (setq tex-command "latexmk -pvc")
+  (setq dvi2-command "evince")
+  (setq YaTeX-on-the-fly-preview-interval nil)
+  (setq bibtex-command "pbibtex")    ;; 自分の環境に合わせて""内を変えてください
+  ;; \sectionの色の設定（うまくいかん）
+  ;;(setq YaTeX-hilit-sectioning-face '(light時のforecolor/backcolor dark時のforecolor/backcolor))
+  (setq YaTeX-hilit-sectioning-face '(darkblue/LightGray LightGray/Black))
+  ;; sectionの階層が変化する時の色の変化の割合（パーセント）
+  ;; (setq YaTeX-hilit-sectioning-attenuation-rate '(light時の割合/dark時の割合))
+  (setq YaTeX-hilit-sectioning-attenuation-rate '(0 0))
+
+  ;;reftex-mode
+  (add-hook 'yatex-mode-hook
+			#'(lambda ()
+				(reftex-mode 1)))
+  )
+
 (add-to-list 'org-latex-classes
 			 '("koma-article"
 			   "\\documentclass{scrartcl}"
@@ -799,7 +839,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (add-to-list 'org-latex-classes
 			 '("jsarticle"
-			   "\\documentclass[dvipdfmx,12pt]{jsarticle}"
+			   "\\documentclass[dvipdfmx]{jsarticle}"
 			   ("\\section{%s}" . "\\section*{%s}")
 			   ("\\subsection{%s}" . "\\subsection*{%s}")
 			   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -809,7 +849,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			 )
 (add-to-list 'org-latex-classes
 			 '("jsreport"
-			   "\\documentclass[dvipdfmx,12pt,report]{jsbook}"
+			   "\\documentclass[dvipdfmx,report]{jsbook}"
 			   ("\\chapter{%s}" . "\\chapter*{%s}")
 			   ("\\section{%s}" . "\\section*{%s}")
 			   ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -819,7 +859,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			 )
 (add-to-list 'org-latex-classes
 			 '("jsbook"
-			   "\\documentclass[dvipdfmx,12pt]{jsbook}"
+			   "\\documentclass[dvipdfmx]{jsbook}"
 			   ("\\part{%s}" . "\\part*{%s}")
 			   ("\\chapter{%s}" . "\\chapter*{%s}")
 			   ("\\section{%s}" . "\\section*{%s}")
@@ -829,7 +869,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			 )
 (add-to-list 'org-latex-classes
 			 '("bxjsarticle"
-			   "\\documentclass[pdflatex,jadriver=standard,12pt]{bxjsarticle}"
+			   "\\documentclass[platex, jadriver=standard]{bxjsarticle}"
 			   ("\\section{%s}" . "\\section*{%s}")
 			   ("\\subsection{%s}" . "\\subsection*{%s}")
 			   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -863,6 +903,17 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			   )
 			 )
 
+(add-to-list 'org-latex-classes
+			 '("ipjs"
+			   "\\documentclass[submit]{ipsj}"
+			   ("\\section{%s}" . "\\section*{%s}")
+			   ("\\subsection{%s}" . "\\subsection*{%s}")
+			   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")
+			   )
+			 )
+
 
 (setq org-latex-default-class "bxjsarticle")
 
@@ -888,7 +939,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
