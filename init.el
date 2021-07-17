@@ -57,7 +57,9 @@
   :bind
     (:map dired-mode-map
 		  ("RET" . dired-open-in-accordance-with-situation)
-		  ("e" . wdired-change-to-wdired-mode))
+		  ("e" . wdired-change-to-wdired-mode)
+		  ("f" . dired-open-in-accordance-with-situation)
+		  ("b" . dired-up-alternate-directory))
   :config
   ;; hydra-dired
   (define-key dired-mode-map
@@ -269,6 +271,32 @@
                 (all-the-icons-faicon "linux")) ;; ""
       (format "%s\n" (make-string (1- (frame-width)) ?\x2D))))
   (setq ivy-pre-prompt-function #'my-pre-prompt-function))
+
+;; prescient
+(when (require 'prescient nil t)
+
+  ;; ivy インターフェイスでコマンドを実行するたびに，キャッシュをファイル保存
+  (setq prescient-aggressive-file-save t)
+
+  ;; ファイルの保存先
+  (setq prescient-save-file
+        (expand-file-name "~/.emacs.d/prescient-save.el"))
+
+  ;; アクティベート
+  (prescient-persist-mode 1))
+
+(when (require 'ivy-prescient nil t)
+
+  ;; =ivy= の face 情報を引き継ぐ（ただし，完全ではない印象）
+  (setq ivy-prescient-retain-classic-highlighting t)
+
+  ;; コマンドを追加
+  (dolist (command '(counsel-M-x)) ;; add :caller
+    (add-to-list 'ivy-prescient-sort-commands command))
+
+  ;; フィルタの影響範囲を限定する．以下の3つは順番が重要．
+  (ivy-prescient-mode 1)
+  (setq ivy-prescient-enable-filtering nil))
 
 ;; all-the-icons
 (use-package all-the-icons)
