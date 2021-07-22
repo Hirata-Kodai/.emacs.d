@@ -759,21 +759,31 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 
 ;;elpy
-(use-package elpy
+;; (use-package elpy
+;;   :ensure t
+;;   :init (elpy-enable)
+;;   :bind (:map elpy-mode-map
+;; 			  ("C-c C-n" . flycheck-next-error)
+;; 			  ("C-c C-p" . flycheck-previous-error)
+;; 			  ("C-c C-l" . flycheck-list-errors))
+;;   :config
+;;   (when (load "flycheck" t t)
+;; 	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;; 	(add-hook 'elpy-mode-hook 'flycheck-mode))
+;;   (setq elpy-rpc-backend "jedi")
+;;   (setq elpy-rpc-python-command "python3")
+;;   (setq flycheck-flake8-maximum-line-length 200))
+
+;; lsp-mode
+(use-package lsp-python-ms
   :ensure t
-  :init (elpy-enable)
-  :bind (:map elpy-mode-map
-			  ("C-c C-n" . flycheck-next-error)
-			  ("C-c C-p" . flycheck-previous-error)
-			  ("C-c C-l" . flycheck-list-errors))
-  :config
-  (when (load "flycheck" t t)
-	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-	(add-hook 'elpy-mode-hook 'flycheck-mode))
-  (setq elpy-rpc-backend "jedi")
-  (setq elpy-rpc-python-command "python3")
-  (setq flycheck-flake8-maximum-line-length 200))
-  
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook
+  (python-mode . (lambda ()
+                          (require 'lsp-python-ms)
+                          (lsp)))
+  (lsp-managed-mode . (lambda () (setq-local company-backends '(company-capf))))
+)
 
 ;;org-babel
 (org-babel-do-load-languages
