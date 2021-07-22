@@ -180,6 +180,13 @@
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-wrap t)
   (setq enable-recursive-minibuffers t)
+  (setq ivy-initial-inputs-alist
+      '((org-agenda-refile . "^")
+        (org-capture-refile . "^")
+        ;; (counsel-M-x . "^") ;; 削除．必要に応じて他のコマンドも除外する．
+        (Man-completion-table . "^")
+        (woman . "^")))
+  (setf (alist-get 'counsel-M-x ivy-re-builders-alist) #'ivy--regex-ignore-order)
   
   ;; (defun isearch-forward-or-swiper (use-swiper)
   ;;   (interactive "p")
@@ -568,13 +575,16 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq default-frame-alist
     (append (list
       '(top . 20) ;ウィンドウの表示位置(Y座標)
-      '(left . 0) ;ウィンドウの表示位置(X座標）
+      '(left . 0) ;ウィンドウの表示位置(X座標)
       '(width . 70) ;ウィンドウ幅
       '(height . 15) ;ウィンドウ高
+	  '(mouse-color . "SlateBlue2") ; マウスポインタの色
+	  ;; '(cursor-color . "snow") ; テキストカーソルの色
     )
     default-frame-alist)
   )
   )
+
 
 ;; スタートアップ画面の非表示
 (setq inhibit-startup-message t)
@@ -808,6 +818,14 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			#'(lambda ()
 				(reftex-mode 1)))
   )
+ (add-hook 'yatex-mode-hook
+			'(lambda ()
+			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
+			   ))
+ (add-hook 'latex-mode-hook
+			'(lambda ()
+			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
+			   ))
 
 (add-to-list 'org-latex-classes
 			 '("koma-article"
@@ -967,7 +985,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
