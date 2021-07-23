@@ -496,6 +496,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package yasnippet
   :ensure t
   :init (yas-global-mode)
+  :diminish yas-minor-mode
   :config
   (setq yas-snippet-dirs
 		'("~/.emacs.d/snippets"
@@ -659,6 +660,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;company
 (use-package company
   :init (global-company-mode)
+  :diminish company-mode
   :config
   (company-quickhelp-mode t)
   (setq company-selection-wrap-around t) ; 候補の最後の次は先頭に戻る
@@ -995,7 +997,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
