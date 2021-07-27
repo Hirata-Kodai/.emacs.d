@@ -194,16 +194,28 @@
   ;;   (let (current-prefix-arg)
   ;;     (call-interactively (if use-swiper 'swiper 'isearch-forward))))
   ;; Toggle migemo and fuzzy by command.
-  
-  ;; (define-key ivy-minibuffer-map (kbd "M-f") #'ivy-migemo-toggle-fuzzy)
-  ;; (define-key ivy-minibuffer-map (kbd "M-i") #'ivy-migemo-toggle-migemo)
+  (use-package ivy-migemo
+	:init (add-to-list 'load-path "~/.emacs.d/elpa/ivy-migemo")
+	:config
+	(define-key ivy-minibuffer-map (kbd "M-f") #'ivy-migemo-toggle-fuzzy)
+	(define-key ivy-minibuffer-map (kbd "M-i") #'ivy-migemo-toggle-migemo)
 
-  ;; ;; If you want to defaultly use migemo on swiper and counsel-find-file:
-  ;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
-  ;; 								(swiper . ivy-migemo--regex-plus)
-  ;; 								(counsel-find-file . ivy-migemo--regex-plus))
-  ;; 										;(counsel-other-function . ivy-migemo--regex-plus)
-  ;; 		)
+	;; If you want to defaultly use migemo on swiper and counsel-find-file:
+	(setq ivy-re-builders-alist '((t . ivy--regex-plus)
+								  (swiper . ivy-migemo--regex-plus)
+								  (counsel-find-file . ivy-migemo--regex-plus)
+								  (counsel-recentf . ivy-migemo--regex-plus)
+								  (counsel-rg . ivy-migemo--regex-plus))
+  										;(counsel-other-function . ivy-migemo--regex-plus)
+		  )
+	(setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)
+								  (swiper-region . ivy-migemo--regex-fuzzy)
+								  (counsel-find-file . ivy-migemo--regex-fuzzy)
+								  (counsel-recentf . ivy-migemo--regex-fuzzy)
+								  (counsel-rg . ivy-migemo--regex-fuzzy))
+  										;(counsel-other-function . ivy-migemo--regex-fuzzy)
+		  )
+	)
 
   ;; (use-package swiper-migemo
   ;; 	:init
@@ -402,7 +414,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
                       splitted))))
 
 (setq ivy-re-builders-alist '((t . ivy--regex-plus)
-                              (swiper . my:ivy-migemo-re-builder)))
+                              (swiper . my:ivy-migemo-re-builder)
+							  ))
 
 ;; If you want to defaultly use migemo on swiper and counsel-find-file:
 ;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
@@ -994,6 +1007,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 	("28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default)))
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
+ '(ivy-prescient-sort-commands
+   (quote
+	(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region)))
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
