@@ -789,16 +789,29 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;   (setq elpy-rpc-python-command "python3")
 ;;   (setq flycheck-flake8-maximum-line-length 200))
 
-;; lsp-mode
-(use-package lsp-python-ms
+;; eglot
+(use-package eglot
   :ensure t
-  :init (setq lsp-python-ms-auto-install-server t)
   :hook
-  (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp)))
-  (lsp-managed-mode . (lambda () (setq-local company-backends '(company-capf))))
+  (python-mode . eglot-ensure)
+  :bind (:map eglot-mode-map
+  			  ("C-c e n" . eglot-rename))
+  :config
+  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) 
 )
+
+
+;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
+(use-package lsp-python-ms
+  ;; :ensure t
+  ;; :init (setq lsp-python-ms-auto-install-server t)
+  ;; :hook
+  ;; (python-mode . (lambda ()
+  ;;                         (require 'lsp-python-ms)
+  ;;                         (lsp)))
+  ;; (lsp-managed-mode . (lambda () (setq-local company-backends '(company-capf))))
+)
+
 
 ;;org-babel
 (org-babel-do-load-languages
