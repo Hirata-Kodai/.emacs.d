@@ -798,7 +798,26 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   			  ("C-c e n" . eglot-rename))
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) 
-)
+  )
+
+;; ivy-xref(動いてない？)
+(use-package ivy-xref
+  :ensure t
+  :config
+  ;; xref initialization is different in Emacs 27 - there are two different
+;; variables which can be set rather than just one
+(when (>= emacs-major-version 27)
+  (setq xref-show-definitions-function #'ivy-xref-show-defs))
+;; Necessary in Emacs <27. In Emacs 27 it will affect all xref-based
+;; commands other than xref-find-definitions (e.g. project-find-regexp)
+;; as well
+(setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+
+;;smart jump
+(use-package smart-jump
+ :ensure t
+ :config
+ (smart-jump-setup-default-registers))
 
 
 ;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
@@ -1026,7 +1045,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
