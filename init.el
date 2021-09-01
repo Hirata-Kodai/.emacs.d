@@ -6,7 +6,6 @@
 ;; You may delete these explanatory comments.
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives  '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 (require 'use-package)
@@ -162,6 +161,14 @@
 
 ;; magit-status
 (global-set-key (kbd "C-c g") 'magit-status)
+
+;; ediff
+;; コントロール用のバッファを同一フレーム内に表示する
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+;; ediff のバッファを左右に並べる（"|"キーで上下、左右の切り替え可）
+(setq ediff-split-window-function 'split-window-horizontally)
+
 
 ;;ivy
 (use-package ivy
@@ -561,7 +568,14 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   )
 
 ;; 括弧などの補完
-(electric-pair-mode 1)
+;; (electric-pair-mode 1)
+(use-package smartparens
+  :ensure t
+  :diminish smartparens-mode
+  :hook
+  (emacs-lisp-mode . smartparens-mode)
+  (python-mode . smartparens-mode)
+  (org-mode . smartparens-mode))
 
 
 ;; ウィンドウを透明にする(できてない)
@@ -616,7 +630,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 
 ;; 対応する括弧を光らせる
-(show-paren-mode 1)
+;; (show-paren-mode 1)
+(show-smartparens-global-mode 1)
 ;; 対応する括弧を強調表示(マッチ部分)
 (set-face-attribute 'show-paren-match nil :background "LightGoldenrod1" :bold t)
 
@@ -1045,7 +1060,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
