@@ -22,7 +22,6 @@
 (delete-selection-mode t) ; リージョンを削除可能に設定
 (setq show-help-function nil) ; help文を非表示
 
-
 (set-fontset-font
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
@@ -44,6 +43,9 @@
   (setq iflipb-wrap-around t)
   (bind-key "C-M-<right>" 'iflipb-next-buffer)
   (bind-key "C-M-<left>" 'iflipb-previous-buffer))
+
+(use-package eldoc
+  :diminish eldoc-mode)
 
 ;; dired
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
@@ -161,6 +163,14 @@
 
 ;; magit-status
 (global-set-key (kbd "C-c g") 'magit-status)
+;; README プレビュー
+(use-package grip-mode
+  :ensure t
+  :diminish grip-mode)
+(use-package markdown-mode
+  :bind (:map markdown-mode-command-map
+			  ("g" . grip-mode)))
+
 
 ;; ediff
 ;; コントロール用のバッファを同一フレーム内に表示する
@@ -527,7 +537,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :after (yasnippet)
   :bind (("C-c y" . ivy-yasnippet)
          ("C-c C-y" . ivy-yasnippet)))
-  
+
+;; Python
+(use-package python
+  :bind (("C-c C-a" . pyvenv-activate)))
+
 ;; c言語関係
 (use-package irony
   :defer t
@@ -575,7 +589,86 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :hook
   (emacs-lisp-mode . smartparens-mode)
   (python-mode . smartparens-mode)
+  (inferior-python-mode . smartparens-mode)
+  (eshell-mode . smartparens-mode)
   (org-mode . smartparens-mode))
+
+;; 追加設定(https://ebzzry.com/en/emacs-pairs/)
+;; (defmacro def-pairs (pairs)
+;;   "Define functions for pairing. PAIRS is an alist of (NAME . STRING)
+;; conses, where NAME is the function name that will be created and
+;; STRING is a single-character string that marks the opening character.
+
+;;   (def-pairs ((paren . \"(\")
+;;               (bracket . \"[\"))
+
+;; defines the functions WRAP-WITH-PAREN and WRAP-WITH-BRACKET,
+;; respectively."
+;;   `(progn
+;;      ,@(loop for (key . val) in pairs
+;;              collect
+;;              `(defun ,(read (concat
+;;                              "wrap-with-"
+;;                              (prin1-to-string key)
+;;                              "s"))
+;;                   (&optional arg)
+;;                 (interactive "p")
+;;                 (sp-wrap-with-pair ,val)))))
+
+;; (def-pairs ((paren . "(")
+;;             (bracket . "[")
+;;             (brace . "{")
+;;             (single-quote . "'")
+;;             (double-quote . "\"")
+;;             (back-quote . "`")))
+
+;; (bind-keys
+;;  :map smartparens-mode-map
+;;  ("C-M-a" . sp-beginning-of-sexp)
+;;  ("C-M-e" . sp-end-of-sexp)
+
+;;  ("C-<down>" . sp-down-sexp)
+;;  ("C-<up>"   . sp-up-sexp)
+;;  ("M-<down>" . sp-backward-down-sexp)
+;;  ("M-<up>"   . sp-backward-up-sexp)
+
+;;  ("C-M-f" . sp-forward-sexp)
+;;  ("C-M-b" . sp-backward-sexp)
+
+;;  ("C-M-n" . sp-next-sexp)
+;;  ("C-M-p" . sp-previous-sexp)
+
+;;  ("C-S-f" . sp-forward-symbol)
+;;  ("C-S-b" . sp-backward-symbol)
+
+;;  ("C-<right>" . sp-forward-slurp-sexp)
+;;  ("M-<right>" . sp-forward-barf-sexp)
+;;  ("C-<left>"  . sp-backward-slurp-sexp)
+;;  ("M-<left>"  . sp-backward-barf-sexp)
+
+;;  ("C-M-t" . sp-transpose-sexp)
+;;  ("C-M-k" . sp-kill-sexp)
+;;  ("C-k"   . sp-kill-hybrid-sexp)
+;;  ("M-k"   . sp-backward-kill-sexp)
+;;  ("C-M-w" . sp-copy-sexp)
+;;  ("C-M-d" . delete-sexp)
+
+;;  ("M-<backspace>" . backward-kill-word)
+;;  ("C-<backspace>" . sp-backward-kill-word)
+;;  ([remap sp-backward-kill-word] . backward-kill-word)
+
+;;  ("M-[" . sp-backward-unwrap-sexp)
+;;  ("M-]" . sp-unwrap-sexp)
+
+;;  ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+;;  ("C-c ("  . wrap-with-parens)
+;;  ("C-c ["  . wrap-with-brackets)
+;;  ("C-c {"  . wrap-with-braces)
+;;  ("C-c '"  . wrap-with-single-quotes)
+;;  ("C-c \"" . wrap-with-double-quotes)
+;;  ("C-c _"  . wrap-with-underscores)
+;;  ("C-c `"  . wrap-with-back-quotes))
 
 
 ;; ウィンドウを透明にする(できてない)
@@ -815,6 +908,15 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) 
   )
 
+;; flymake の拡張
+(use-package flymake-diagnostic-at-point
+  :init (add-to-list 'load-path "~/.emacs.d/elpa/flymake-diagnostic-at-point")
+  :after flymake
+  :config
+  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)
+  (setq flymake-diagnostic-at-point-error-prefix " "))
+
+
 ;; ivy-xref(動いてない？)
 (use-package ivy-xref
   :ensure t
@@ -850,8 +952,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((emacs-lisp . nil)
-      (C . t)))
+ '((emacs-lisp . t)
+   (C . t)
+   (python . t)
+   (shell . t)))
+(setq org-babel-python-command "python3")
 
 ;;latex関連
 ;;org-latex-classesがxelatex用の設定になっているので直す
@@ -1043,6 +1148,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (nyan-start-music)
   )
 
+(random t)
+(if (< (random 10) 5) (setq comd "echo-sd") (setq comd "echo-sd --center GNUEmacs"))  ;  https://fumiyas.github.io/2013/12/25/echo-sd.sh-advent-calendar.html
+(defun display-startup-echo-area-message ()
+  (shell-command comd))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -1060,7 +1169,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1075,4 +1184,5 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 
 (load-theme 'adwaita t)
+
 
