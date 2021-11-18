@@ -453,6 +453,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
   (load-library "migemo")
+  (migemo-kill)
   (migemo-init)
   )
 
@@ -1147,6 +1148,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (nyan-start-animation)
   ;; (nyan-start-music)
   )
+
+;; csv のソートを降順に
+(setq csv-descending t)
 
 (random t)
 (if (< (random 10) 5) (setq comd "echo-sd") (setq comd "echo-sd --center GNUEmacs"))  ;  https://fumiyas.github.io/2013/12/25/echo-sd.sh-advent-calendar.html
