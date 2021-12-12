@@ -6,6 +6,8 @@
 ;; You may delete these explanatory comments.
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 (require 'use-package)
@@ -21,11 +23,13 @@
 (setq-default tab-width 4)
 (delete-selection-mode t) ; リージョンを削除可能に設定
 (setq show-help-function nil) ; help文を非表示
+(global-auto-revert-mode 1)
 
 (set-fontset-font
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
 (set-face-font 'default "Ricty Diminished-12")
+;; (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 0.8))
 
 ;; ブラウザの設定
 (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
@@ -163,6 +167,7 @@
 
 ;; magit-status
 (global-set-key (kbd "C-c g") 'magit-status)
+(setq magit-auto-revert-mode t)
 ;; README プレビュー
 (use-package grip-mode
   :ensure t
@@ -190,6 +195,7 @@
   ("C-x C-f" . counsel-find-file)
   ("C-x C-r" . counsel-recentf)
   ("C-x t" . counsel-tramp)
+  ("C-x r b" . counsel-bookmark)
   :bind*
   ("C-c C-r" . ivy-resume)
   :config
@@ -388,25 +394,25 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			  '((t . my-ivy-format-function-arrow))))
 	(setq ivy-format-functions-alist '((t . ivy-format-function-arrow))))
 
-  ;; ivyのマッチ部分のface
-  (custom-set-faces
-   '(ivy-current-match
-	 ((((class color) (background light))
-	   :background "#e0daab" :distant-foreground "#000000")
-	  (((class color) (background dark))
-	   :background "#404040" :distant-foreground "#abb2bf")))
-   '(ivy-minibuffer-match-face-1
-	 ((((class color) (background light)) :foreground "#666666")
-	  (((class color) (background dark)) :foreground "#999999")))
-   '(ivy-minibuffer-match-face-2
-	 ((((class color) (background light)) :foreground "#c03333" :underline t)
-	  (((class color) (background dark)) :foreground "#e04444" :underline t)))
-   '(ivy-minibuffer-match-face-3
-	 ((((class color) (background light)) :foreground "#8585ff" :underline t)
-	  (((class color) (background dark)) :foreground "#7777ff" :underline t)))
-   '(ivy-minibuffer-match-face-4
-	 ((((class color) (background light)) :foreground "#439943" :underline t)
-	  (((class color) (background dark)) :foreground "#33bb33" :underline t))))
+  ;; ivyのマッチ部分のface (Custom で設定しているからいらない？)
+  ;; (custom-set-faces
+  ;;  '(ivy-current-match
+  ;; 	 ((((class color) (background light))
+  ;; 	   :background "#e0daab" :distant-foreground "#000000")
+  ;; 	  (((class color) (background dark))
+  ;; 	   :background "#404040" :distant-foreground "#abb2bf")))
+  ;;  '(ivy-minibuffer-match-face-1
+  ;; 	 ((((class color) (background light)) :foreground "#666666")
+  ;; 	  (((class color) (background dark)) :foreground "#999999")))
+  ;;  '(ivy-minibuffer-match-face-2
+  ;; 	 ((((class color) (background light)) :foreground "#c03333" :underline t)
+  ;; 	  (((class color) (background dark)) :foreground "#e04444" :underline t)))
+  ;;  '(ivy-minibuffer-match-face-3
+  ;; 	 ((((class color) (background light)) :foreground "#8585ff" :underline t)
+  ;; 	  (((class color) (background dark)) :foreground "#7777ff" :underline t)))
+  ;;  '(ivy-minibuffer-match-face-4
+  ;; 	 ((((class color) (background light)) :foreground "#439943" :underline t)
+  ;; 	  (((class color) (background dark)) :foreground "#33bb33" :underline t))))
   )
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
@@ -459,7 +465,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (use-package org
   :init
-  (setq my-org-directory "/mnt/c/Users/fight/GoogleDrive/org/")
+  (setq my-org-directory "~/Dropbox/org/")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
 		 ("C-c a" . org-agenda)
@@ -469,17 +475,17 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-capture-templates
       '(
 	;; タスク（スケジュールなし）
-	("t" "タスク（スケジュールなし）" entry (file+headline "/mnt/c/Users/fight/GoogleDrive/org/non_Scheduled_Tasks.org" "Tasks")
+	("t" "タスク（スケジュールなし）" entry (file+headline "~/Dropbox/org/non_Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n")
  
 	;; タスク（スケジュールあり）
-	("s" "タスク（スケジュールあり）" entry (file+headline "/mnt/c/Users/fight/GoogleDrive/org/Scheduled_Tasks.org" "Tasks")
+	("s" "タスク（スケジュールあり）" entry (file+headline "~/Dropbox/org/Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n   SCHEDULED: %^t \n")
 	
-        ("m" "Memo" checkitem (file+headline "/mnt/c/Users/fight/GoogleDrive/org/memo.org" "追記")
+        ("m" "Memo" checkitem (file+headline "~/Dropbox/org/memo.org" "追記")
 	 "- %? \n")
  
-        ("T" "Tech" checkitem (file+headline "/mnt/c/Users/fight/GoogleDrive/org/tech/TechMemo.org" "追記")
+        ("T" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
 	 "- %? \n")
 		)
 	  )
@@ -504,10 +510,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
 			   ))
   (setq org-agenda-files '(
-             "/mnt/c/Users/fight/GoogleDrive/org/non_Scheduled_Tasks.org"
-             "/mnt/c/Users/fight/GoogleDrive/org/Scheduled_Tasks.org"
-			 "/mnt/c/Users/fight/GoogleDrive/org/memo.org"
-			 "/mnt/c/Users/fight/GoogleDrive/org/yaritai.org"
+             "~/Dropbox/org/non_Scheduled_Tasks.org"
+             "~/Dropbox/org/Scheduled_Tasks.org"
+			 "~/Dropbox/org/memo.org"
+			 "~/Dropbox/org/yaritai.org"
                          )))
 
 (use-package org-bullets
@@ -519,7 +525,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package open-junk-file
   :bind ("C-c j" . open-junk-file)
   :config
-  (setq open-junk-file-format "/mnt/c/Users/fight/GoogleDrive/org/junk/%Y-%m%d-memo.org")
+  (setq open-junk-file-format "~/Dropbox/org/junk/%Y-%m%d-memo.org")
   ;; (setq open-junk-file-find-file-function 'find-file)  ;; custom経由で設定
   )
 
@@ -575,7 +581,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 	(quickrun-shell)))
 (use-package quickrun
   :ensure t
-  :bind* ("<f5>" . my-quickrun)
+  :bind* ("<f1>" . my-quickrun)
   :config
   (quickrun-add-command "python"
   '((:command . "python3"))
@@ -986,7 +992,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq bibtex-command "pbibtex")    ;; 自分の環境に合わせて""内を変えてください
   ;; \sectionの色の設定（うまくいかん）
   ;;(setq YaTeX-hilit-sectioning-face '(light時のforecolor/backcolor dark時のforecolor/backcolor))
-  (setq YaTeX-hilit-sectioning-face '(darkblue/LightGray LightGray/Black))
+  (setq YaTeX-hilit-sectioning-face '(LightSkyBlue/LightGray LightGray/Black))
   ;; sectionの階層が変化する時の色の変化の割合（パーセント）
   ;; (setq YaTeX-hilit-sectioning-attenuation-rate '(light時の割合/dark時の割合))
   (setq YaTeX-hilit-sectioning-attenuation-rate '(0 0))
@@ -1141,12 +1147,32 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (setq org-latex-default-class "bxjsarticle")
 
-(use-package nyan-mode
+
+;; モードライン系
+
+;; doom-modeline
+(use-package doom-modeline
   :ensure t
-  :init
-  (nyan-mode t)
-  ;; (nyan-start-animation)
-  ;; (nyan-start-music)
+  :init (doom-modeline-mode 1)
+)
+
+;; nyan-mode
+;; (use-package nyan-mode
+;;   :ensure t
+;;   :init
+;;   (nyan-mode t)
+;;   ;; (nyan-start-animation)
+;;   ;; (nyan-start-music)
+;;   )
+
+;; Pokémon
+;; ポケモンのリスト(https://github.com/RyanMillerC/poke-line/blob/master/docs/pokemon.md)
+(use-package poke-line
+  :ensure t
+  :config
+  (poke-line-global-mode 1)
+  (setq-default poke-line-pokemon "wobbuffet")
+  ;; (poke-line-set-random-pokemon)
   )
 
 ;; csv のソートを降順に
@@ -1164,7 +1190,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-	("28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default)))
+	("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default)))
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
  '(ivy-prescient-sort-commands
@@ -1173,7 +1199,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '(open-junk-file-find-file-function (quote find-file))
  '(package-selected-packages
    (quote
-	(grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
+	(org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
  '(show-paren-style (quote parenthesis)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
