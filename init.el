@@ -24,6 +24,8 @@
 (delete-selection-mode t) ; リージョンを削除可能に設定
 (setq show-help-function nil) ; help文を非表示
 (global-auto-revert-mode 1)
+(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+(global-set-key (kbd "<f5>") 'help-for-help)
 
 (set-fontset-font
     nil 'japanese-jisx0208
@@ -813,6 +815,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
   (define-key company-active-map [tab] 'company-complete-common2)
   (define-key company-active-map [backtab] 'company-select-previous)
+  (define-key company-active-map (kbd "C-n") nil)
+  (define-key company-active-map (kbd "C-p") nil)
+  (define-key company-active-map (kbd "M-n") 'company-select-next)
+  (define-key company-active-map (kbd "M-p") 'company-select-previous)
   ;; comapny-box(まだアイコンが一種類しかでない、背景がおかしい)
 ;;   (use-package company-box
 ;;     :diminish
@@ -1178,6 +1184,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; csv のソートを降順に
 (setq csv-descending t)
 
+(defun mail-address_to_clip ()
+  "e-mail to clipboard"
+  (interactive)
+  (kill-new "fighters21fun@eis.hokudai.ac.jp")
+  (message "Copied e-mail to clipboard"))
+(global-set-key (kbd "<f7>") 'mail-address_to_clip)
+
 (random t)
 (if (< (random 10) 5) (setq comd "echo-sd") (setq comd "echo-sd --center GNUEmacs"))  ;  https://fumiyas.github.io/2013/12/25/echo-sd.sh-advent-calendar.html
 (defun display-startup-echo-area-message ()
@@ -1214,5 +1227,3 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 
 (load-theme 'adwaita t)
-
-
