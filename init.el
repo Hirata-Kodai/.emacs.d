@@ -26,6 +26,7 @@
 (global-auto-revert-mode 1)
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-set-key (kbd "<f5>") 'help-for-help)
+(setq gc-cons-threshold 1600000)  ; lsp が重かったら2倍にする
 
 (set-fontset-font
     nil 'japanese-jisx0208
@@ -893,7 +894,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (add-to-list 'company-backends '(company-irony-c-headers company-irony))
   )
 
-
+(use-package company-math
+  :ensure t
+  :demand t
+  :after (company yatex)
+  :config
+  (push 'company-math-symbols-latex company-backends)
+  (push 'company-latex-commands company-backends))
 ;;elpy
 ;; (use-package elpy
 ;;   :ensure t
@@ -990,6 +997,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; yatex
 (use-package yatex
   :ensure t
+  :init (setq YaTeX-inhibit-prefix-letter t)
   :config
   (add-to-list 'auto-mode-alist '("\\.tex\\'" . yatex-mode)) ;;auto-mode-alistへの追加
   (setq tex-command "latexmk -pvc")
@@ -1105,7 +1113,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			 )
 (add-to-list 'org-latex-classes
 			 '("bxjsarticle"
-			   "\\documentclass[platex, jadriver=standard]{bxjsarticle}"
+			   "\\documentclass[uplatex, jadriver=standard]{bxjsarticle}"
 			   ("\\section{%s}" . "\\section*{%s}")
 			   ("\\subsection{%s}" . "\\subsection*{%s}")
 			   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -1202,18 +1210,15 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-	("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default)))
+   '("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default))
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
  '(ivy-prescient-sort-commands
-   (quote
-	(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region)))
- '(open-junk-file-find-file-function (quote find-file))
+   '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
+ '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   (quote
-	(org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy)))
- '(show-paren-style (quote parenthesis)))
+   '(tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
+ '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
