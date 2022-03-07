@@ -573,6 +573,49 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   )
 
+;; web-mode(html 専用)
+(use-package web-mode
+  :ensure t
+  :config
+  ;; html を web-mode で開く
+  (add-to-list 'auto-mode-alist '("\\.html?$"     . web-mode))
+  ;; 要素のハイライト
+  (setq web-mode-enable-current-element-highlight t)
+  ;; フォントの配色
+  (set-face-attribute 'web-mode-doctype-face nil :foreground "Pink3")
+  (set-face-attribute 'web-mode-html-tag-face nil :foreground "Blue")
+  ;; (set-face-attribute 'web-mode-html-attr-value-face nil :foreground "Black")
+  ;; (set-face-attribute 'web-mode-html-attr-name-face nil :foreground "#0FF")
+  (set-face-background 'web-mode-current-element-highlight-face "violet")
+  ;; タグを自動で閉じる
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-closing t)
+  
+  ;; ;; .js, .jsx を web-mode で開く
+  ;; (add-to-list 'auto-mode-alist '("\\.js[x]?$" . web-mode))
+
+  ;; ;; 拡張子 .js でもJSX編集モードに
+  ;; (setq web-mode-content-types-alist
+  ;; 		'(("jsx" . "\\.js[x]?\\'")))
+  ;; インデント
+  (add-hook 'web-mode-hook
+			'(lambda ()
+               (setq web-mode-attr-indent-offset nil)
+               (setq web-mode-markup-indent-offset 2)
+               (setq web-mode-css-indent-offset 2)
+               (setq web-mode-code-indent-offset 2)
+               (setq web-mode-sql-indent-offset 2)
+               (setq indent-tabs-mode nil)
+               (setq tab-width 2)
+			   ))
+  )
+
+(use-package js2-mode
+  :ensure t
+  :init
+    (add-to-list 'auto-mode-alist '("\.js$" . js2-mode))
+  :hook
+  (js2-mode . eglot-ensure))
 
 
 ;; quickrun
@@ -917,17 +960,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;   (setq elpy-rpc-python-command "python3")
 ;;   (setq flycheck-flake8-maximum-line-length 200))
 
-;; eglot
-(use-package eglot
-  :ensure t
-  :hook
-  (python-mode . eglot-ensure)
-  :bind (:map eglot-mode-map
-  			  ("C-c e n" . eglot-rename))
-  :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) 
-  )
-
 ;; flymake の拡張
 (use-package flymake-diagnostic-at-point
   :init (add-to-list 'load-path "~/.emacs.d/elpa/flymake-diagnostic-at-point")
@@ -956,6 +988,17 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  :config
  (smart-jump-setup-default-registers))
 
+; eglot
+(use-package eglot
+  :ensure t
+  :hook
+  (python-mode . eglot-ensure)
+  :bind (:map eglot-mode-map
+  			  ("C-c e n" . eglot-rename))
+  :config
+  (add-to-list 'eglot-server-programs '(python-mode . ("/home/hiratako/.local/bin/pylsp")))
+  ;; (add-to-list 'eglot-server-programs '(web-mode . ("/usr/local/bin/typescript-language-server")))
+  )
 
 ;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
 (use-package lsp-python-ms
@@ -975,7 +1018,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
  '((emacs-lisp . t)
    (C . t)
    (python . t)
-   (shell . t)))
+   (shell . t)
+   (js . t)))
 (setq org-babel-python-command "python3")
 
 ;;latex関連
@@ -1192,6 +1236,16 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; csv のソートを降順に
 (setq csv-descending t)
 
+;; docker
+(use-package docker
+  :ensure t
+  :bind ("C-c d" . docker))
+;; Dockerfile-mode
+(use-package dockerfile-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+
 (defun mail-address_to_clip ()
   "e-mail to clipboard"
   (interactive)
@@ -1217,7 +1271,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
    '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(js2-mode web-mode docker dockerfile-mode tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
