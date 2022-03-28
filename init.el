@@ -25,6 +25,7 @@
 (setq show-help-function nil) ; help文を非表示
 (global-auto-revert-mode 1)
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
+(global-set-key (kbd "M-h") 'backward-kill-word)
 (global-set-key (kbd "<f5>") 'help-for-help)
 (setq gc-cons-threshold 1600000)  ; lsp が重かったら2倍にする
 
@@ -41,6 +42,15 @@
       (setq browse-url-generic-program  cmd-exe
             browse-url-generic-args     cmd-args
             browse-url-browser-function 'browse-url-generic)))
+;; 単語選択
+(defun mark-word-at-point ()
+  (interactive)
+  (let ((char (char-to-string (char-after (point)))))
+    (cond
+     ((string= " " char) (delete-horizontal-space))
+     ((string-match "[\t\n -@\[-`{-~]" char) (mark-word ))
+     (t (forward-char) (backward-word) (mark-word 1)))))
+(global-set-key "\M-@" 'mark-word-at-point)
 
 ;; iflipb（バッファ切り替え）
 (use-package iflipb
@@ -473,7 +483,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :bind (("C-c c" . org-capture)
 		 ("C-c a" . org-agenda)
 		 ("C-c l" . org-store-link)
-		 ("C-c C-l" . org-insert-link))
+		 ("C-c C-l" . org-insert-link)
+		 (:map org-mode-map
+			   ("M-h" . backward-kill-word)))
   :config
   (setq org-capture-templates
       '(
@@ -1245,6 +1257,56 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :ensure t
   :config
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+
+;; vterm
+(global-set-key (kbd "C-@") 'vterm-other-window)
+;; undo-tree
+(use-package undo-tree
+  :ensure t
+  :bind (("C-M-/" . undo-tree-redo) ("C-/" . undo-tree-undo)))
+(global-undo-tree-mode t)
+
+;;neotree（丸パクリ：https://qiita.com/minoruGH/items/2034cad4efe8c5dee4d4）
+(use-package neotree
+  :init
+  (setq-default neo-keymap-style 'concise)
+  :config
+  (setq neo-smart-open t)
+  (setq neo-create-file-auto-open t)
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (bind-key [f8] 'neotree-toggle)
+  (bind-key "RET" 'neotree-enter-hide neotree-mode-map)
+  (bind-key "a" 'neotree-hidden-file-toggle neotree-mode-map)
+  (bind-key "<left>" 'neotree-select-up-node neotree-mode-map)
+  (bind-key "<right>" 'neotree-change-root neotree-mode-map))
+
+
+;; Change neotree's font size
+;; Tips from https://github.com/jaypei/emacs-neotree/issues/218
+(defun neotree-text-scale ()
+  "Text scale for neotree."
+  (interactive)
+  (text-scale-adjust 0)
+  (text-scale-decrease 1)
+  (message nil))
+(add-hook 'neo-after-create-hook
+      (lambda (_)
+        (call-interactively 'neotree-text-scale)))
+
+;; neotree enter hide
+;; Tips from https://github.com/jaypei/emacs-neotree/issues/77
+(defun neo-open-file-hide (full-path &optional arg)
+  "Open file and hiding neotree.
+The description of FULL-PATH & ARG is in `neotree-enter'."
+  (neo-global--select-mru-window arg)
+  (find-file full-path)
+  (neotree-hide))
+
+(defun neotree-enter-hide (&optional arg)
+  "Neo-open-file-hide if file, Neo-open-dir if dir.
+The description of ARG is in `neo-buffer--execute'."
+  (interactive "P")
+  (neo-buffer--execute arg 'neo-open-file-hide 'neo-open-dir))
 
 (defun mail-address_to_clip ()
   "e-mail to clipboard"
