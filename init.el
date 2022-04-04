@@ -43,20 +43,26 @@
             browse-url-generic-args     cmd-args
             browse-url-browser-function 'browse-url-generic)))
 ;; 単語選択
-(defun mark-word-at-point ()
-  (interactive)
-  (let ((char (char-to-string (char-after (point)))))
-    (cond
-     ((string= " " char) (delete-horizontal-space))
-     ((string-match "[\t\n -@\[-`{-~]" char) (mark-word ))
-     (t (forward-char) (backward-word) (mark-word 1)))))
-(global-set-key "\M-@" 'mark-word-at-point)
+;; (defun mark-word-at-point ()
+;;   (interactive)
+;;   (let ((char (char-to-string (char-after (point)))))
+;;     (cond
+;;      ((string= " " char) (delete-horizontal-space))
+;;      ((string-match "[\t\n -@\[-`{-~]" char) (mark-word ))
+;;      (t (forward-char) (backward-word) (mark-word 1)))))
+;; (global-set-key "\M-@" 'mark-word-at-point)
+
+;; 単語選択(exxpand-region)
+(use-package expand-region
+  :config
+  (global-set-key [remap mark-word] 'er/expand-region)
+  )
 
 ;; iflipb（バッファ切り替え）
 (use-package iflipb
   :ensure t
   :config
-  (setq iflipb-ignore-buffers (list "^magit" "^[*]"))
+  (setq iflipb-ignore-buffers (list "^magit" "^[*]" "^vterm"))
   (setq iflipb-wrap-around t)
   (bind-key "C-M-<right>" 'iflipb-next-buffer)
   (bind-key "C-M-<left>" 'iflipb-previous-buffer))
@@ -874,63 +880,70 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (define-key company-active-map (kbd "C-n") nil)
   (define-key company-active-map (kbd "C-p") nil)
   (define-key company-active-map (kbd "M-n") 'company-select-next)
-  (define-key company-active-map (kbd "M-p") 'company-select-previous)
-  ;; comapny-box(まだアイコンが一種類しかでない、背景がおかしい)
-;;   (use-package company-box
-;;     :diminish
-;;     :hook (company-mode . company-box-mode)
-;;     :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  (define-key company-active-map (kbd "M-p") 'company-select-previous))
+
+;; comapny-box(まだアイコンが一種類しかでない、背景がおかしい)
+(use-package company-box
+  :diminish
+  :hook (company-mode . company-box-mode)
+  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :config
+  ;; (setq company-box-backends-colors nil)
+  ;; (setq company-box-show-single-candidate t)
+  (setq company-box-backends-colors '((company-capf .  (:candidate "blue" :annotation some-face :selected (:background "orange" :foreground "black")))
+									  (company-semantic . (:candidate "blue" :annotation some-face :selected (:background "orange" :foreground "black")))))
+  (setq company-box-max-candidates 50)
+
+  (defun company-box-icons--elisp (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym) 'Function)
+              ((featurep sym) 'Module)
+              ((facep sym) 'Color)
+              ((boundp sym) 'Variable)
+              ((symbolp sym) 'Text)
+              (t . nil)))))
+
+  (with-eval-after-load 'all-the-icons
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-fileicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (declare-function all-the-icons-octicon 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
+            (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
+            (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
+            (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
+            (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
+            (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
+            (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
+            (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
+            (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
+            (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
+            (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
+            (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
+            (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
+            (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
+
+;; (use-package company-posframe
+;;     :ensure t
+;;     :diminish company-posframe-mode
+;;     :after company
 ;;     :config
-;;     ;; (setq company-box-backends-colors nil)
-;;     ;; (setq company-box-show-single-candidate t)
-;;     (setq company-box-max-candidates 50)
-
-;;     (defun company-box-icons--elisp (candidate)
-;;       (when (derived-mode-p 'emacs-lisp-mode)
-;;         (let ((sym (intern candidate)))
-;;           (cond ((fboundp sym) 'Function)
-;;                 ((featurep sym) 'Module)
-;;                 ((facep sym) 'Color)
-;;                 ((boundp sym) 'Variable)
-;;                 ((symbolp sym) 'Text)
-;;                 (t . nil)))))
-
-;;     (with-eval-after-load 'all-the-icons
-;;       (declare-function all-the-icons-faicon 'all-the-icons)
-;;       (declare-function all-the-icons-fileicon 'all-the-icons)
-;;       (declare-function all-the-icons-material 'all-the-icons)
-;;       (declare-function all-the-icons-octicon 'all-the-icons)
-;;       (setq company-box-icons-all-the-icons
-;;             `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.7 :v-adjust -0.15))
-;;               (Text . ,(all-the-icons-faicon "book" :height 0.68 :v-adjust -0.15))
-;;               (Method . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-;;               (Function . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-;;               (Constructor . ,(all-the-icons-faicon "cube" :height 0.7 :v-adjust -0.05 :face 'font-lock-constant-face))
-;;               (Field . ,(all-the-icons-faicon "tags" :height 0.65 :v-adjust -0.15 :face 'font-lock-warning-face))
-;;               (Variable . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face))
-;;               (Class . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-;;               (Interface . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01))
-;;               (Module . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.15))
-;;               (Property . ,(all-the-icons-octicon "package" :height 0.7 :v-adjust -0.05 :face 'font-lock-warning-face)) ;; Golang module
-;;               (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.7 :v-adjust -0.15))
-;;               (Value . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'font-lock-constant-face))
-;;               (Enum . ,(all-the-icons-material "storage" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-orange))
-;;               (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.7 :v-adjust -0.15))
-;;               (Snippet . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))
-;;               (Color . ,(all-the-icons-material "palette" :height 0.7 :v-adjust -0.15))
-;;               (File . ,(all-the-icons-faicon "file-o" :height 0.7 :v-adjust -0.05))
-;;               (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.7 :v-adjust -0.15))
-;;               (Folder . ,(all-the-icons-octicon "file-directory" :height 0.7 :v-adjust -0.05))
-;;               (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.7 :v-adjust -0.15 :face 'all-the-icons-blueb))
-;;               (Constant . ,(all-the-icons-faicon "tag" :height 0.7 :v-adjust -0.05))
-;;               (Struct . ,(all-the-icons-faicon "clone" :height 0.65 :v-adjust 0.01 :face 'font-lock-constant-face))
-;;               (Event . ,(all-the-icons-faicon "bolt" :height 0.7 :v-adjust -0.05 :face 'all-the-icons-orange))
-;;               (Operator . ,(all-the-icons-fileicon "typedoc" :height 0.65 :v-adjust 0.05))
-;;               (TypeParameter . ,(all-the-icons-faicon "hashtag" :height 0.65 :v-adjust 0.07 :face 'font-lock-const-face))
-;;               (Template . ,(all-the-icons-faicon "code" :height 0.7 :v-adjust 0.02 :face 'font-lock-variable-name-face))))))
-)
-
-
+;;     (company-posframe-mode 1))
 
 
 ;; (use-package company-box
@@ -1259,7 +1272,34 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
 
 ;; vterm
-(global-set-key (kbd "C-@") 'vterm-other-window)
+(use-package vterm
+  :bind
+  ("C-@" . vterm-toggle)
+  (:map vterm-mode-map
+   ("C-M-@" . my/vterm-new-buffer-in-current-window)
+   ("C-<return>" . vterm-toggle-insert-cd)
+   ([remap iflipb-next-buffer] . vterm-toggle-forward)
+   ([remap iflipb-previous-buffer] . vterm-toggle-backward))
+  :config
+  (setq vterm-buffer-name-string "vterm: %s")
+  )
+(use-package vterm-toggle
+  :ensure t
+  :config
+  (setq vterm-toggle-scope 'project)
+  ;; Show vterm buffer in the window located at bottom
+  (add-to-list 'display-buffer-alist
+               '((lambda(bufname _) (with-current-buffer bufname (equal major-mode 'vterm-mode)))
+                 (display-buffer-reuse-window display-buffer-in-direction)
+                 (direction . bottom)
+                 (reusable-frames . visible)
+                 (window-height . 0.2)))
+  ;; Above display config affects all vterm command, not only vterm-toggle
+  (defun my/vterm-new-buffer-in-current-window()
+    (interactive)
+    (let ((display-buffer-alist nil))
+            (vterm)))
+  )
 ;; undo-tree
 (use-package undo-tree
   :ensure t
@@ -1314,6 +1354,17 @@ The description of ARG is in `neo-buffer--execute'."
   (kill-new "fighters21fun@eis.hokudai.ac.jp")
   (message "Copied e-mail to clipboard"))
 (global-set-key (kbd "<f7>") 'mail-address_to_clip)
+
+(defun copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+(global-set-key (kbd "<f6>") 'copy-file-name-to-clipboard)
 
 (random t)
 (if (< (random 10) 5) (setq comd "echo-sd") (setq comd "echo-sd --center GNUEmacs"))  ;  https://fumiyas.github.io/2013/12/25/echo-sd.sh-advent-calendar.html
