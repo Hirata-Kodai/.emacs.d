@@ -28,6 +28,7 @@
 (global-set-key (kbd "M-h") 'backward-kill-word)
 (global-set-key (kbd "<f5>") 'help-for-help)
 (setq gc-cons-threshold 1600000)  ; lsp が重かったら2倍にする
+(scroll-bar-mode -1)
 
 (set-fontset-font
     nil 'japanese-jisx0208
@@ -42,6 +43,18 @@
       (setq browse-url-generic-program  cmd-exe
             browse-url-generic-args     cmd-args
             browse-url-browser-function 'browse-url-generic)))
+
+
+;; 括弧などの補完
+(use-package smartparens
+  :ensure t
+  :diminish smartparens-mode
+  :hook
+  (emacs-lisp-mode . smartparens-mode)
+  (python-mode . smartparens-mode)
+  (inferior-python-mode . smartparens-mode)
+  (eshell-mode . smartparens-mode)
+  (org-mode . smartparens-mode))
 ;; 単語選択
 ;; (defun mark-word-at-point ()
 ;;   (interactive)
@@ -568,7 +581,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;; Python
 (use-package python
-  :bind (("C-c C-a" . pyvenv-activate)))
+  :bind (("C-c C-a" . pyvenv-activate))
+  :hook (python-mode . (lambda () (setq python-indent-offset 4))))
 
 ;; c言語関係
 (use-package irony
@@ -652,17 +666,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :override t)
   )
 
-;; 括弧などの補完
-;; (electric-pair-mode 1)
-(use-package smartparens
-  :ensure t
-  :diminish smartparens-mode
-  :hook
-  (emacs-lisp-mode . smartparens-mode)
-  (python-mode . smartparens-mode)
-  (inferior-python-mode . smartparens-mode)
-  (eshell-mode . smartparens-mode)
-  (org-mode . smartparens-mode))
 
 ;; 追加設定(https://ebzzry.com/en/emacs-pairs/)
 ;; (defmacro def-pairs (pairs)
@@ -1384,7 +1387,7 @@ The description of ARG is in `neo-buffer--execute'."
    '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(js2-mode web-mode docker dockerfile-mode tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
