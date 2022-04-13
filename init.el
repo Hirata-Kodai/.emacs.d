@@ -191,7 +191,13 @@
 (setq make-backup-files nil)
 
 ;;; mozc
-(use-package mozc)                                 ; mozcの読み込み
+(use-package mozc
+  :config
+  (add-hook 'input-method-inactivate-hook
+ 	    (lambda() (set-cursor-color "#00BBFF")))
+   (add-hook 'input-method-activate-hook
+ 	    (lambda() (set-cursor-color "pink")))
+  )
 (setq default-input-method "japanese-mozc")     ; IMEをjapanes-mozcに
 (global-unset-key [zenkaku-hankaku])
 (global-set-key [zenkaku-hankaku] #'toggle-input-method)
