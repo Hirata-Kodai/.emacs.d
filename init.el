@@ -1312,7 +1312,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; undo-tree
 (use-package undo-tree
   :ensure t
-  :bind (("C-M-/" . undo-tree-redo) ("C-/" . undo-tree-undo)))
+  :bind (("C-M-/" . undo-tree-redo) ("C-/" . undo-tree-undo))
+  :config
+  ;; Prevent undo tree files from polluting your git repo
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
 (global-undo-tree-mode t)
 
 ;;neotree（丸パクリ：https://qiita.com/minoruGH/items/2034cad4efe8c5dee4d4）
