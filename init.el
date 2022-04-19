@@ -1279,6 +1279,19 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :ensure t
   :config
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+;; docker-compose-mode
+(use-package yaml-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\.yml$" . yaml-mode))
+  (add-to-list 'auto-mode-alist '("\.yaml$" . yaml-mode))
+  )
+(use-package docker-compose-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("docker-compose.yml" . docker-compose-mode))
+  (add-to-list 'auto-mode-alist '("docker-compose.yaml" . docker-compose-mode))
+  )
 
 ;; vterm
 (use-package vterm
@@ -1396,7 +1409,7 @@ The description of ARG is in `neo-buffer--execute'."
    '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm org dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file org-bullets org-plus-contrib use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
