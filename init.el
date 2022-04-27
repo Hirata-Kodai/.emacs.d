@@ -562,6 +562,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package org-bullets
   :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
+;; org ファイルから qiita に投稿できる markdown を生成するパッケージ
+(use-package ox-qmd
+  :config
+  (add-to-list 'ox-qmd-language-keyword-alist '(("shell-script" . "sh")
+												("python" . "py")))
+  )
+
 
 ;;htmlなどにエクスポートするとき
 ;; (use-package ox-bibtex)
@@ -1412,7 +1419,7 @@ The description of ARG is in `neo-buffer--execute'."
    '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
