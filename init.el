@@ -1434,3 +1434,5 @@ The description of ARG is in `neo-buffer--execute'."
 
 
 (load-theme 'adwaita t)
+(fset 'next
+   (kmacro-lambda-form [?\C-x ?\C-s ?\C-n ?\C-a ?\M-@ ?\M-w ?\C-e ?\C-t ?\C-x ?\C-f ?\C-y return ?\C-x ?h] 0 "%d"))
