@@ -1,0 +1,28 @@
+# name: report
+# key: report
+# contributor: hiratako
+# --
+\documentclass[uplatex, jadriver=standard]{bxjsarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[sort,compress,super,comma]{natbib}
+\author{北海道大学　大学院情報科学院　修士1年　平田航大（学生番号：46213043）}
+\date{E-mail : hiratako@ist.hokudai.ac.jp}
+\title{${1:title}}
+\begin{document}
+
+$0
+
+\maketitle
+\bibliography{${2:citation}}
+\bibliographystyle{${3:ipsjunsrt}}
+\end{document}

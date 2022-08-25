@@ -1,0 +1,33 @@
+# name: jsarticle
+# key: jsarticle
+# contributor: hiratako
+# --
+
+\documentclass[dvipdfmx]{jsarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{北海道大学　大学院情報科学院　修士1年　平田航大（学生番号：46213043）}
+\date{\today}
+
+\title{${1:タイトル}}
+\begin{document}
+\maketitle
+
+
+$0
+
+
+\bibliography{${2:citation}}
+\bibliographystyle{${3:ipsjsort-e}}
+\end{document}

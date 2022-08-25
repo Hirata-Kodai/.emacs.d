@@ -1,0 +1,5 @@
+# name: as_import
+# key: as
+# --
+import ${1:lib} as ${2:name}
+$0

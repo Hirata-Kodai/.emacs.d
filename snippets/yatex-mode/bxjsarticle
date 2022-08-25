@@ -1,0 +1,27 @@
+# name: bxjsarticle
+# key: bxjsarticle
+# contributor: hiratako
+# --
+
+\documentclass[uplatex,dvipdfmx,a4paper,twocolumn,base=11pt,jbase=11pt,ja=standard]{bxjsarticle}
+\usepackage[dvips]{graphicx}
+\usepackage{latexsym}
+\usepackage{plext}
+\usepackage{url}
+\usepackage{here}
+\usepackage[normalem]{ulem}
+
+\title{${1:タイトル}}
+\author{平田 航大 北海道大学 大学院情報科学院}
+%\author{北海道大学 大学院情報科学研究院}{横山 想一郎}{Soichiro Yokoyama, Faculty of Information Science and Technology, Hokkaido University}
+%\author{北海道大学 大学院情報科学研究院}{山下 倫央}{Tomohisa Yamashita, Faculty of Information Science and Technology, Hokkaido University}
+%\author{北海道大学 大学院情報科学研究院}{川村 秀憲}{Hidenori Kawamura, Faculty of Information Science and Technology, Hokkaido University}
+
+\begin{document}
+\maketitle
+
+$0
+
+\bibliographystyle{${2:ipsjunsrt}}
+\bibliography{${3:papers, url}}
+\end{document}

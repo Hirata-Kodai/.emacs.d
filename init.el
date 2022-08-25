@@ -598,7 +598,14 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; Python
 (use-package python
   :bind (("C-c C-a" . pyvenv-activate))
-  :hook (python-mode . (lambda () (setq python-indent-offset 4))))
+  :hook (python-mode . (lambda () (setq python-indent-offset 4)))
+  :config
+  (setq python-indent-guess-indent-offset-verbose nil))
+
+(use-package numpydoc
+  :ensure t
+  :bind (:map python-mode-map
+              ("C-c C-n" . numpydoc-generate)))
 
 ;; c言語関係
 (use-package irony
@@ -1417,9 +1424,11 @@ The description of ARG is in `neo-buffer--execute'."
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
  '(ivy-prescient-sort-commands
    '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
+ '(numpydoc-insert-examples-block nil)
+ '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

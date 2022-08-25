@@ -1,0 +1,14 @@
+# name: html5_template
+# key: !
+# contributor: from_emmet
+# --
+<!DOCTYPE html>
+<html lang="${1:en}">
+<head>
+    <meta charset="UTF-8" />
+    <title>${2:Title}</title>
+</head>
+<body>
+    $0
+</body>
+</html>

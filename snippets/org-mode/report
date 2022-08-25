@@ -1,0 +1,16 @@
+# name: report
+# contributor: hirata
+# --
+#+title: $1
+#+author: 北海道大学　大学院情報科学院　修士1年　平田航大（学生番号：46213043）
+#+date: E-mail : hiratako@ist.hokudai.ac.jp
+#+latex_class: bxjsarticle
+#+options: toc:nil num:nil
+#+LaTeX_HEADER: \usepackage[sort,compress,super,comma]{natbib}
+
+$0
+
+
+
+\bibliography{citation}
+\bibliographystyle{ipsjsort-e}
