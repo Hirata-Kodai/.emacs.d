@@ -28,6 +28,8 @@
 (global-set-key (kbd "<f5>") 'help-for-help)
 (setq gc-cons-threshold 1600000)  ; lsp が重かったら2倍にする
 (scroll-bar-mode -1)
+(setq confirm-kill-processes nil)  ; Stop confirming the killing of processes
+(set-mouse-color "SlateBlue2")
 
 (set-fontset-font
     nil 'japanese-jisx0208
@@ -602,6 +604,20 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (setq python-indent-guess-indent-offset-verbose nil))
 
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
+
+(use-package poetry
+  :ensure t
+  :defer t
+  :config
+  ;; Checks for the correct virtualenv. Better strategy IMO because the default
+  ;; one is quite slow.
+  (setq poetry-tracking-strategy 'switch-buffer)
+  :hook (python-mode . poetry-tracking-mode))
+
 (use-package numpydoc
   :ensure t
   :bind (:map python-mode-map
@@ -672,6 +688,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :hook
   (js2-mode . eglot-ensure))
 
+;; java
+(eval-after-load 'eglot-java
+  (progn
+    (require 'eglot-java)
+    (setq eglot-java-prefix-key "C-c l")
+    (setq eglot-java-default-bindings-enabled t)
+    '(eglot-java-init)))
 
 ;; quickrun
 (defun my-quickrun ()
@@ -796,8 +819,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
       '(left . 0) ;ウィンドウの表示位置(X座標)
       '(width . 70) ;ウィンドウ幅
       '(height . 15) ;ウィンドウ高
-	  '(mouse-color . "SlateBlue2") ; マウスポインタの色
-	  ;; '(cursor-color . "snow") ; テキストカーソルの色
     )
     default-frame-alist)
   )
@@ -1428,7 +1449,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
