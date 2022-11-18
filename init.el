@@ -1441,6 +1441,7 @@ The description of ARG is in `neo-buffer--execute'."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default))
+ '(eglot-java-server-install-dir "~/.emacs.d/share/jdt-language-server-1.11.0")
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
  '(ivy-prescient-sort-commands
