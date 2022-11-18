@@ -624,25 +624,25 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
               ("C-c C-n" . numpydoc-generate)))
 
 ;; c言語関係
-(use-package irony
-  :defer t
-  :commands irony-mode
-  :init
-  (add-hook 'c-mode-common-hook 'irony-mode)
-  (add-hook 'c-mode-common-hook 'flycheck-mode)
-  (add-hook 'c++-mode-hook 'irony-mode)
-  :config
-  ;; C言語用にコンパイルオプションを設定する.
-  (add-hook 'c-mode-hook
-            '(lambda ()
-               (setq irony-additional-clang-options '("-std=c11" "-Wall" "-Wextra"))))
+;; (use-package irony
+;;   :defer t
+;;   :commands irony-mode
+;;   :init
+;;   (add-hook 'c-mode-common-hook 'irony-mode)
+;;   (add-hook 'c-mode-common-hook 'flycheck-mode)
+;;   (add-hook 'c++-mode-hook 'irony-mode)
+;;   :config
+;;   ;; C言語用にコンパイルオプションを設定する.
+;;   (add-hook 'c-mode-hook
+;;             '(lambda ()
+;;                (setq irony-additional-clang-options '("-std=c11" "-Wall" "-Wextra"))))
 
-  ;; C++言語用にコンパイルオプションを設定する.
-  (add-hook 'c++-mode-hook
-            '(lambda ()
-               (setq irony-additional-clang-options '("-std=c++14" "-Wall" "-Wextra"))))
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  )
+;;   ;; C++言語用にコンパイルオプションを設定する.
+;;   (add-hook 'c++-mode-hook
+;;             '(lambda ()
+;;                (setq irony-additional-clang-options '("-std=c++14" "-Wall" "-Wextra"))))
+;;   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+;;   )
 
 ;; web-mode(html 専用)
 (use-package web-mode
@@ -1002,12 +1002,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;   (company-box-doc-enable nil))
 
 
-(use-package company-irony
-  :defer t
-  :config
-  ;; companyの補完のバックエンドにironyを使用する.
-  (add-to-list 'company-backends '(company-irony-c-headers company-irony))
-  )
+;; (use-package company-irony
+;;   :defer t
+;;   :config
+;;   ;; companyの補完のバックエンドにironyを使用する.
+;;   (add-to-list 'company-backends '(company-irony-c-headers company-irony))
+;;   )
 
 (use-package company-math
   :ensure t
@@ -1070,6 +1070,19 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("/home/hiratako/.local/bin/pylsp")))
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("/usr/local/bin/typescript-language-server")))
+  )
+
+(use-package copilot
+  :init (add-to-list 'load-path "~/.emacs.d/elpa/copilot.el/")
+  :hook
+  (prog-mode . copilot-mode)
+  :config
+  (with-eval-after-load 'company
+	;; disable inline previews
+	(delq 'company-preview-if-just-one-frontend company-frontends)
+  
+	(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+	(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
   )
 
 ;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
@@ -1439,6 +1452,7 @@ The description of ARG is in `neo-buffer--execute'."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(copilot-idle-delay 2)
  '(custom-safe-themes
    '("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default))
  '(eglot-java-server-install-dir "~/.emacs.d/share/jdt-language-server-1.11.0")
