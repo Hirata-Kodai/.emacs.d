@@ -31,6 +31,10 @@
 (setq confirm-kill-processes nil)  ; Stop confirming the killing of processes
 (set-mouse-color "SlateBlue2")
 
+;; scratch buffer を org mode 仕様に
+(setq initial-major-mode 'org-mode)
+(setq initial-scratch-message "")
+
 (set-fontset-font
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
@@ -71,6 +75,34 @@
   :config
   (global-set-key [remap mark-word] 'er/expand-region)
   )
+;; マルチカーソル
+(use-package multiple-cursors
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c m e") 'mc/edit-ends-of-lines)
+  (global-set-key (kbd "C-c m a") 'mc/edit-beginnings-of-lines)
+  (global-set-key (kbd "C-c m n") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-c m p") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c m l") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-c m m") 'mc/mark-more-like-this-extended)
+  )
+;; グローバルに有効にできれば使えそう
+;; (use-package region-bindings-mode
+;;   :ensure t
+;;   :bind
+;;   (:map region-bindings-mode-map
+;; 		("l" . mc/mark-all-like-this)
+;; 		("n" . mc/mark-next-like-this)
+;; 		("p" . mc/mark-previous-like-this)
+;; 		("e" . mc/edit-ends-of-lines)
+;; 		("a" . mc/edit-beginnings-of-lines)
+;; 		("m" . mc/mark-more-like-this-extended)
+;; 		)
+;;   :config
+;;   (region-bindings-mode-enable)
+;;   (region-bindings-mode)
+;;   )
+  
 
 ;; iflipb（バッファ切り替え）
 (use-package iflipb
@@ -1464,7 +1496,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1479,5 +1511,4 @@ The description of ARG is in `neo-buffer--execute'."
 
 
 (load-theme 'adwaita t)
-(fset 'next
-   (kmacro-lambda-form [?\C-x ?\C-s ?\C-n ?\C-a ?\M-@ ?\M-w ?\C-e ?\C-t ?\C-x ?\C-f ?\C-y return ?\C-x ?h] 0 "%d"))
+
