@@ -5,3 +5,16 @@ elpa/
 elpy/
 eshell/
 irony/
+.lsp-session-v1
+.mc-lists.el
+eglot-eclipse-jdt-cache/
+eln-cache/
+network-security.data
+notes
+prescient-save.el
+projects
+recentf
+share/
+tramp
+transient/
+url/

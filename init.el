@@ -39,7 +39,14 @@
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
 (set-face-font 'default "Ricty Diminished-12")
-;; (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 0.8))
+(add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 1.0))
+;; wsl2
+(set-face-attribute 'default nil
+					:height 180)
+;; mobaXTerm と併用するなら、モニタの解像度で条件分岐する方法がありそう
+;; (set-face-attribute 'default nil
+;; 					:height 150)
+
 
 ;; ブラウザの設定
 (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
@@ -59,7 +66,9 @@
   (python-mode . smartparens-mode)
   (inferior-python-mode . smartparens-mode)
   (eshell-mode . smartparens-mode)
-  (org-mode . smartparens-mode))
+  (org-mode . smartparens-mode)
+  (js2-mode . smartparens-mode)
+  )
 ;; 単語選択
 ;; (defun mark-word-at-point ()
 ;;   (interactive)
@@ -1104,18 +1113,19 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("/usr/local/bin/typescript-language-server")))
   )
 
-(use-package copilot
-  :init (add-to-list 'load-path "~/.emacs.d/elpa/copilot.el/")
-  :hook
-  (prog-mode . copilot-mode)
-  :config
-  (with-eval-after-load 'company
-	;; disable inline previews
-	(delq 'company-preview-if-just-one-frontend company-frontends)
+;; メモリの使用量がやばいので一旦保留
+;; (use-package copilot
+;;   :init (add-to-list 'load-path "~/.emacs.d/elpa/copilot.el/")
+;;   :hook
+;;   (prog-mode . copilot-mode)
+;;   :config
+;;   (with-eval-after-load 'company
+;; 	;; disable inline previews
+;; 	(delq 'company-preview-if-just-one-frontend company-frontends)
   
-	(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-	(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
-  )
+;; 	(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+;; 	(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+;;   )
 
 ;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
 (use-package lsp-python-ms
@@ -1138,6 +1148,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
    (shell . t)
    (js . t)))
 (setq org-babel-python-command "python3")
+(setq org-edit-src-content-indentation 0)
 
 ;;latex関連
 ;;org-latex-classesがxelatex用の設定になっているので直す
