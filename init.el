@@ -574,7 +574,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 	 "- %? \n")
  
         ("T" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
-	 "- %? \n")
+		 "- %? \n")
+		("a" "App案" entry (file+headline "~/Dropbox/org/yaritai.org" "アプリ案")
+		 "** %? \n")
+	    ("y" "yaritai" checkitem (file+headline "~/Dropbox/org/yaritai.org" "追記")
+		 "- %? \n")
 		)
 	  )
   (setq org-tag-alist '(("Haiku" . ?h) ("School" . ?s)))
