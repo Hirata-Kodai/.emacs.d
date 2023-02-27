@@ -6,7 +6,6 @@ elpy/
 eshell/
 irony/
 .lsp-session-v1
-.mc-lists.el
 eglot-eclipse-jdt-cache/
 eln-cache/
 network-security.data
