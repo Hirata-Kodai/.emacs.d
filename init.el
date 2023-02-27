@@ -68,6 +68,7 @@
   (eshell-mode . smartparens-mode)
   (org-mode . smartparens-mode)
   (js2-mode . smartparens-mode)
+  (java-mode . smartparens-mode)
   )
 ;; 単語選択
 ;; (defun mark-word-at-point ()
@@ -522,6 +523,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (setq ivy-re-builders-alist '((t . ivy--regex-plus)
                               (swiper . my:ivy-migemo-re-builder)
+							  (counsel-rg . my:ivy-migemo-re-builder)
 							  ))
 
 ;; If you want to defaultly use migemo on swiper and counsel-find-file:
@@ -536,7 +538,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :ensure t
   :config
   (setq migemo-command "cmigemo")
-  (setq migemo-options '("-q" "--emacs"))
+  (setq migemo-options '("-q" "--emacs" "--nonewline"))
   ;; Set your installed path
   (setq migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")
   (setq migemo-user-dictionary nil)
