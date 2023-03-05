@@ -9,6 +9,7 @@
 		iflipb-next-buffer
 		ivy-switch-buffer
 		keyboard-escape-quit
+		mozc-handle-event
 		org-beginning-of-line
 		org-cycle
 		org-delete-char

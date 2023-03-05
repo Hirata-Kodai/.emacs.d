@@ -35,11 +35,14 @@
 (setq initial-major-mode 'org-mode)
 (setq initial-scratch-message "")
 
+
+;; mac にしたら要調整
 (set-fontset-font
     nil 'japanese-jisx0208
     (font-spec :family "Ricty Diminished"))
 (set-face-font 'default "Ricty Diminished-12")
-(add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 1.0))
+;; (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 0.85))  ;; 外部モニター用
+(add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 1.0))  ;; ノートPC用
 ;; wsl2
 (set-face-attribute 'default nil
 					:height 180)
@@ -48,6 +51,7 @@
 ;; 					:height 150)
 
 
+;; mac にしたら要調整
 ;; ブラウザの設定
 (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
       (cmd-args '("/c" "start")))
@@ -302,6 +306,7 @@
   ;;   (let (current-prefix-arg)
   ;;     (call-interactively (if use-swiper 'swiper 'isearch-forward))))
   ;; Toggle migemo and fuzzy by command.
+  ;; mac にしたら要調整
   (use-package ivy-migemo
 	:init (add-to-list 'load-path "~/.emacs.d/elpa/ivy-migemo")
 	:config
@@ -563,22 +568,24 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-capture-templates
       '(
 	;; タスク（スケジュールなし）
-	("t" "タスク（スケジュールなし）" entry (file+headline "~/Dropbox/org/non_Scheduled_Tasks.org" "Tasks")
+	("n" "Non scheduled Task" entry (file+headline "~/Dropbox/org/non_Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n")
- 
+	;; mac にしたら要調整
 	;; タスク（スケジュールあり）
-	("s" "タスク（スケジュールあり）" entry (file+headline "~/Dropbox/org/Scheduled_Tasks.org" "Tasks")
+	("s" "Scheduled Task" entry (file+headline "~/Dropbox/org/Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n   SCHEDULED: %^t \n")
 	
         ("m" "Memo" checkitem (file+headline "~/Dropbox/org/memo.org" "追記")
 	 "- %? \n")
  
-        ("T" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
+        ("t" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
 		 "- %? \n")
 		("a" "App案" entry (file+headline "~/Dropbox/org/yaritai.org" "アプリ案")
 		 "** %? \n")
-	    ("y" "yaritai" checkitem (file+headline "~/Dropbox/org/yaritai.org" "追記")
-		 "- %? \n")
+	    ("y" "Yaritai" entry (file+headline "~/Dropbox/org/yaritai.org" "追記")
+		 "** %? \n")
+		("i" "Idea" entry (file+headline "~/Dropbox/org/idea.org" "追記")
+		 "** %? \n")
 		)
 	  )
   (setq org-tag-alist '(("Haiku" . ?h) ("School" . ?s)))
@@ -1080,6 +1087,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;;   (setq flycheck-flake8-maximum-line-length 200))
 
 ;; flymake の拡張
+;; mac にしたら要調整
 (use-package flymake-diagnostic-at-point
   :init (add-to-list 'load-path "~/.emacs.d/elpa/flymake-diagnostic-at-point")
   :after flymake
