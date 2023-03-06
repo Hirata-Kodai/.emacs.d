@@ -556,7 +556,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (use-package org
   :init
-  (setq my-org-directory "~/Dropbox/org/")
+  (setq my-org-directory "~/iCloudDrive/org/")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
 		 ("C-c a" . org-agenda)
@@ -568,23 +568,23 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-capture-templates
       '(
 	;; タスク（スケジュールなし）
-	("n" "Non scheduled Task" entry (file+headline "~/Dropbox/org/non_Scheduled_Tasks.org" "Tasks")
+	("n" "Non scheduled Task" entry (file+headline "~/iCloudDrive/org/non_Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n")
 	;; mac にしたら要調整
 	;; タスク（スケジュールあり）
-	("s" "Scheduled Task" entry (file+headline "~/Dropbox/org/Scheduled_Tasks.org" "Tasks")
+	("s" "Scheduled Task" entry (file+headline "~/iCloudDrive/org/Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n   SCHEDULED: %^t \n")
 	
-        ("m" "Memo" checkitem (file+headline "~/Dropbox/org/memo.org" "追記")
+        ("m" "Memo" checkitem (file+headline "~/iCloudDrive/org/memo.org" "追記")
 	 "- %? \n")
  
-        ("t" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
+        ("t" "Tech" checkitem (file+headline "~/iCloudDrive/org/tech/TechMemo.org" "追記")
 		 "- %? \n")
-		("a" "App案" entry (file+headline "~/Dropbox/org/yaritai.org" "アプリ案")
+		("a" "App案" entry (file+headline "~/iCloudDrive/org/yaritai.org" "アプリ案")
 		 "** %? \n")
-	    ("y" "Yaritai" entry (file+headline "~/Dropbox/org/yaritai.org" "追記")
+	    ("y" "Yaritai" entry (file+headline "~/iCloudDrive/org/yaritai.org" "追記")
 		 "** %? \n")
-		("i" "Idea" entry (file+headline "~/Dropbox/org/idea.org" "追記")
+		("i" "Idea" entry (file+headline "~/iCloudDrive/org/idea.org" "追記")
 		 "** %? \n")
 		)
 	  )
@@ -609,10 +609,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
 			   ))
   (setq org-agenda-files '(
-             "~/Dropbox/org/non_Scheduled_Tasks.org"
-             "~/Dropbox/org/Scheduled_Tasks.org"
-			 "~/Dropbox/org/memo.org"
-			 "~/Dropbox/org/yaritai.org"
+             "~/iCloudDrive/org/non_Scheduled_Tasks.org"
+             "~/iCloudDrive/org/Scheduled_Tasks.org"
+			 "~/iCloudDrive/org/memo.org"
+			 "~/iCloudDrive/org/yaritai.org"
                          )))
 
 (use-package org-bullets
@@ -631,7 +631,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package open-junk-file
   :bind ("C-c j" . open-junk-file)
   :config
-  (setq open-junk-file-format "~/Dropbox/org/junk/%Y-%m%d-memo.org")
+  (setq open-junk-file-format "~/iCloudDrive/org/junk/%Y-%m%d-memo.org")
   ;; (setq open-junk-file-find-file-function 'find-file)  ;; custom経由で設定
   )
 

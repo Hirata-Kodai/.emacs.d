@@ -1,0 +1,65 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("org-capture-last-stored-marker"
+ (filename . "~/iCloudDrive/org/yaritai.org")
+ (front-context-string . "** 結局，人生はアウトプットで")
+ (rear-context-string . "l を作れる\n* 気になる本\n\n")
+ (position . 6360))
+("org-refile-last-stored"
+ (filename . "~/iCloudDrive/org/yaritai.org")
+ (front-context-string . "** 結局，人生はアウトプットで")
+ (rear-context-string . "l を作れる\n* 気になる本\n\n")
+ (position . 6360))
+("issue"
+ (filename . "~/iCloudDrive/org/tech/issue/")
+ (front-context-string . "RuntimeError_CUD")
+ (rear-context-string . "37 Jun  9  2021 ")
+ (position . 249))
+("career"
+ (filename . "~/iCloudDrive/org/career.org")
+ (front-context-string . "* 就活関係メモ\n  |----")
+ (rear-context-string . "nil author:nil\n\n")
+ (position . 59))
+("読みたい論文"
+ (filename . "/mnt/c/Users/fight/GoogleDrive/研究関係/読みたい論文/")
+ (front-context-string . "A Survey on Auto")
+ (rear-context-string . "96 Jun  3  2020 ")
+ (position . 253))
+("読んだ論文"
+ (filename . "/mnt/c/Users/fight/GoogleDrive/研究関係/読んだ論文/")
+ (front-context-string . "Attention Is All")
+ (rear-context-string . "96 Apr 22  2020 ")
+ (position . 264))
+("yaritai"
+ (filename . "~/iCloudDrive/org/yaritai.org")
+ (front-context-string)
+ (rear-context-string . "ゲームとか\n  - [ ] 就活")
+ (position . 186))
+("TechMemo"
+ (filename . "~/iCloudDrive/org/tech/TechMemo.org")
+ (front-context-string . "* emacsのショートカット\n")
+ (rear-context-string)
+ (position . 1))
+("Scheduled"
+ (filename . "~/iCloudDrive/org/Scheduled_Tasks.org")
+ (front-context-string . "* Tasks\n** TODO ")
+ (rear-context-string)
+ (position . 1))
+("nonScheduled"
+ (filename . "~/iCloudDrive/org/non_Scheduled_Tasks.org")
+ (front-context-string . "* TODO 今週やること [0")
+ (rear-context-string)
+ (position . 1))
+("memo"
+ (filename . "~/iCloudDrive/org/memo.org")
+ (front-context-string . "* ミーティングメモ\n** マル")
+ (rear-context-string)
+ (position . 1))
+("org-capture-last-stored"
+ (filename . "~/iCloudDrive/org/idea.org")
+ (front-context-string . "** 他の人のホームディレクトリ")
+ (rear-context-string . "結果を受けて生活を改善したい \n")
+ (position . 675))
+)
