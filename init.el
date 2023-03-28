@@ -30,6 +30,7 @@
 (scroll-bar-mode -1)
 (setq confirm-kill-processes nil)  ; Stop confirming the killing of processes
 (set-mouse-color "SlateBlue2")
+(mac-auto-ascii-mode 1)  ; C-xやM-x を打った際に英語モードに切り替える
 
 ;; scratch buffer を org mode 仕様に
 (setq initial-major-mode 'org-mode)
@@ -37,10 +38,10 @@
 
 
 ;; mac にしたら要調整
-(set-fontset-font
-    nil 'japanese-jisx0208
-    (font-spec :family "Ricty Diminished"))
-(set-face-font 'default "Ricty Diminished-12")
+;; (set-fontset-font
+;;     nil 'japanese-jisx0208
+;;     (font-spec :family "Ricty Diminished"))
+;; (set-face-font 'default "Ricty Diminished-12")
 ;; (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 0.85))  ;; 外部モニター用
 (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 1.0))  ;; ノートPC用
 ;; wsl2
@@ -556,7 +557,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (use-package org
   :init
-  (setq my-org-directory "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/")
+  (setq my-org-directory "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
 		 ("C-c a" . org-agenda)
@@ -568,23 +569,23 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-capture-templates
       '(
 	;; タスク（スケジュールなし）
-	("n" "Non scheduled Task" entry (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/non_Scheduled_Tasks.org" "Tasks")
+	("n" "Non scheduled Task" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/non_Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n")
 	;; mac にしたら要調整
 	;; タスク（スケジュールあり）
-	("s" "Scheduled Task" entry (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/Scheduled_Tasks.org" "Tasks")
+	("s" "Scheduled Task" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n   SCHEDULED: %^t \n")
 	
-        ("m" "Memo" checkitem (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/memo.org" "追記")
+        ("m" "Memo" checkitem (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/memo.org" "追記")
 	 "- %? \n")
  
-        ("t" "Tech" checkitem (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/tech/TechMemo.org" "追記")
+        ("t" "Tech" checkitem (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/tech/TechMemo.org" "追記")
 		 "- %? \n")
-		("a" "App案" entry (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/yaritai.org" "アプリ案")
+		("a" "App案" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org" "アプリ案")
 		 "** %? \n")
-	    ("y" "Yaritai" entry (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/yaritai.org" "追記")
+	    ("y" "Yaritai" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org" "追記")
 		 "** %? \n")
-		("i" "Idea" entry (file+headline "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/idea.org" "追記")
+		("i" "Idea" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/idea.org" "追記")
 		 "** %? \n")
 		)
 	  )
@@ -609,10 +610,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
 			   ))
   (setq org-agenda-files '(
-             "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/non_Scheduled_Tasks.org"
-             "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/Scheduled_Tasks.org"
-			 "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/memo.org"
-			 "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/yaritai.org"
+             "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/non_Scheduled_Tasks.org"
+             "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/Scheduled_Tasks.org"
+			 "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/memo.org"
+			 "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org"
                          )))
 
 (use-package org-bullets
@@ -631,7 +632,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package open-junk-file
   :bind ("C-c j" . open-junk-file)
   :config
-  (setq open-junk-file-format "~/iCloudDrive/iCloud~com~appsonthemove~beorg/org/junk/%Y-%m%d-memo.org")
+  (setq open-junk-file-format "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/junk/%Y-%m%d-memo.org")
   ;; (setq open-junk-file-find-file-function 'find-file)  ;; custom経由で設定
   )
 
@@ -743,12 +744,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (js2-mode . eglot-ensure))
 
 ;; java
-(eval-after-load 'eglot-java
-  (progn
-    (require 'eglot-java)
-    (setq eglot-java-prefix-key "C-c l")
-    (setq eglot-java-default-bindings-enabled t)
-    '(eglot-java-init)))
+;;(eval-after-load 'eglot-java
+;;  (progn
+;;    (require 'eglot-java)
+;;    (setq eglot-java-prefix-key "C-c l")
+;;    (setq eglot-java-default-bindings-enabled t)
+;;    '(eglot-java-init)))
 
 ;; quickrun
 (defun my-quickrun ()
@@ -981,7 +982,12 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (define-key company-active-map (kbd "C-n") nil)
   (define-key company-active-map (kbd "C-p") nil)
   (define-key company-active-map (kbd "M-n") 'company-select-next)
-  (define-key company-active-map (kbd "M-p") 'company-select-previous))
+  (define-key company-active-map (kbd "M-p") 'company-select-previous)
+  (defun my-company-inhibit-idle-begin ()
+	(setq-local company-begin-commands nil))
+  (add-hook 'org-mode-hook #'my-company-inhibit-idle-begin)
+  (add-hook 'text-mode-hook #'my-company-inhibit-idle-begin)
+  )
 
 ;; comapny-box(まだアイコンが一種類しかでない、背景がおかしい)
 (use-package company-box
@@ -1521,7 +1527,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit zone-nyan nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -1536,4 +1542,3 @@ The description of ARG is in `neo-buffer--execute'."
 
 
 (load-theme 'adwaita t)
-
