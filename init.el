@@ -36,6 +36,46 @@
 (setq initial-major-mode 'org-mode)
 (setq initial-scratch-message "")
 
+; mac-auto-ascii-mode 時に日本語入力を保ってほしい関数の設定
+(defvar mac-win-last-ime-status 'off) ;; {'off|'on}
+(defun mac-win-save-last-ime-status ()
+  (setq mac-win-last-ime-status
+        (if (string-match "\\.\\(Roman\\|ABC\\)$" (mac-input-source))
+            'off 'on)))
+(defun mac-win-restore-ime ()
+  (when (and mac-auto-ascii-mode (eq mac-win-last-ime-status 'on))
+    (mac-select-input-source
+     "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"))) ;; (mac-input-source) を評価して名前を調べる
+(defun advice:mac-auto-ascii-setup-input-source (&optional _prompt)
+  "Extension to store IME status"
+  (mac-win-save-last-ime-status))
+(advice-add 'mac-auto-ascii-setup-input-source :before
+            #'advice:mac-auto-ascii-setup-input-source)
+(defun mac-win-restore-ime-target-commands ()
+  (when (and mac-auto-ascii-mode 
+             (eq mac-win-last-ime-status 'on))
+    (mapc (lambda (command)
+            (when (string-match
+                   (format "^%s" command) (format "%s" this-command))
+              (mac-select-input-source
+               "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"))) ;; (mac-input-source) を評価して名前を調べる
+          mac-win-target-commands)))
+(add-hook 'pre-command-hook 'mac-win-restore-ime-target-commands)
+;; M-x でのコマンド選択でもIMEを戻せる．
+;; ただし，移動先で q が効かないことがある（要改善）
+(add-hook 'minibuffer-setup-hook 'mac-win-save-last-ime-status)
+(add-hook 'minibuffer-exit-hook 'mac-win-restore-ime)
+;; 自動で ASCII入力から日本語入力に引き戻したい関数（デフォルト設定）
+(defvar mac-win-target-commands
+  '(find-file save-buffer other-window delete-window split-window backward-delete-char-untabify))
+;; 自動で ASCII入力から日本語入力に引き戻したい関数（追加設定）
+;; 指定の関数名でマッチさせるので要注意（ my: を追加すれば，my:a, my:b らも対象になる）
+
+;; org-mode で締め切りを設定するとき．
+(add-to-list 'mac-win-target-commands 'org-deadline)
+;; query-replace で変換するとき
+(add-to-list 'mac-win-target-commands 'query-replace)
+
 
 ;; mac にしたら要調整
 ;; (set-fontset-font
@@ -87,8 +127,9 @@
 
 ;; 単語選択(exxpand-region)
 (use-package expand-region
+  :ensure t
   :config
-  (global-set-key [remap mark-word] 'er/expand-region)
+  (global-set-key (kbd "C-@") 'er/expand-region)
   )
 ;; マルチカーソル
 (use-package multiple-cursors
@@ -557,7 +598,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 (use-package org
   :init
-  (setq my-org-directory "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")
+  (setq my-org-directory "~/Dropbox/org")
   :mode (("\\.org$" . org-mode))
   :bind (("C-c c" . org-capture)
 		 ("C-c a" . org-agenda)
@@ -569,23 +610,23 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq org-capture-templates
       '(
 	;; タスク（スケジュールなし）
-	("n" "Non scheduled Task" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/non_Scheduled_Tasks.org" "Tasks")
+	("n" "Non scheduled Task" entry (file+headline "~/Dropbox/org/non_Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n")
 	;; mac にしたら要調整
 	;; タスク（スケジュールあり）
-	("s" "Scheduled Task" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/Scheduled_Tasks.org" "Tasks")
+	("s" "Scheduled Task" entry (file+headline "~/Dropbox/org/Scheduled_Tasks.org" "Tasks")
 	 "** TODO %? \n   SCHEDULED: %^t \n")
 	
-        ("m" "Memo" checkitem (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/memo.org" "追記")
+        ("m" "Memo" checkitem (file+headline "~/Dropbox/org/memo.org" "追記")
 	 "- %? \n")
  
-        ("t" "Tech" checkitem (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/tech/TechMemo.org" "追記")
+        ("t" "Tech" checkitem (file+headline "~/Dropbox/org/tech/TechMemo.org" "追記")
 		 "- %? \n")
-		("a" "App案" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org" "アプリ案")
+		("a" "App案" entry (file+headline "~/Dropbox/org/yaritai.org" "アプリ案")
 		 "** %? \n")
-	    ("y" "Yaritai" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org" "追記")
+	    ("y" "Yaritai" entry (file+headline "~/Dropbox/org/yaritai.org" "追記")
 		 "** %? \n")
-		("i" "Idea" entry (file+headline "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/idea.org" "追記")
+		("i" "Idea" entry (file+headline "~/Dropbox/org/idea.org" "追記")
 		 "** %? \n")
 		)
 	  )
@@ -610,11 +651,13 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 			   (add-hook 'before-save-hook 'replace-dot-comma nil 'make-it-local)
 			   ))
   (setq org-agenda-files '(
-             "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/non_Scheduled_Tasks.org"
-             "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/Scheduled_Tasks.org"
-			 "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/memo.org"
-			 "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/yaritai.org"
-                         )))
+             "~/Dropbox/org/non_Scheduled_Tasks.org"
+             "~/Dropbox/org/Scheduled_Tasks.org"
+			 "~/Dropbox/org/memo.org"
+			 "~/Dropbox/org/yaritai.org"
+             ))
+  (add-to-list 'mac-win-target-commands 'org-delete-backward-char)
+  )
 
 (use-package org-bullets
   :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
@@ -632,7 +675,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package open-junk-file
   :bind ("C-c j" . open-junk-file)
   :config
-  (setq open-junk-file-format "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/junk/%Y-%m%d-memo.org")
+  (setq open-junk-file-format "~/Dropbox/org/junk/%Y-%m%d-memo.org")
   ;; (setq open-junk-file-find-file-function 'find-file)  ;; custom経由で設定
   )
 
@@ -1410,9 +1453,9 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; vterm
 (use-package vterm
   :bind
-  ("C-@" . vterm-toggle)
+  ("C-:" . vterm-toggle)
   (:map vterm-mode-map
-   ("C-M-@" . my/vterm-new-buffer-in-current-window)
+   ("C-M-:" . my/vterm-new-buffer-in-current-window)
    ("C-<return>" . vterm-toggle-insert-cd)
    ([remap iflipb-next-buffer] . vterm-toggle-forward)
    ([remap iflipb-previous-buffer] . vterm-toggle-backward))
@@ -1490,7 +1533,7 @@ The description of ARG is in `neo-buffer--execute'."
 (defun mail-address_to_clip ()
   "e-mail to clipboard"
   (interactive)
-  (kill-new "fighters21fun@eis.hokudai.ac.jp")
+  (kill-new "hiratako.0530@gmail.com")
   (message "Copied e-mail to clipboard"))
 (global-set-key (kbd "<f7>") 'mail-address_to_clip)
 
@@ -1527,7 +1570,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(expand-region region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
