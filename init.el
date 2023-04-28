@@ -78,10 +78,10 @@
 
 
 ;; mac にしたら要調整
-;; (set-fontset-font
-;;     nil 'japanese-jisx0208
-;;     (font-spec :family "Ricty Diminished"))
-;; (set-face-font 'default "Ricty Diminished-12")
+(set-fontset-font
+    nil 'japanese-jisx0208
+    (font-spec :family "Ricty Diminished"))
+(set-face-font 'default "Ricty Diminished-19")
 ;; (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 0.85))  ;; 外部モニター用
 (add-to-list 'face-font-rescale-alist '(".*Ricty Diminished.*" . 1.0))  ;; ノートPC用
 ;; wsl2
@@ -168,6 +168,18 @@
   (setq iflipb-wrap-around t)
   (bind-key "C-M-<right>" 'iflipb-next-buffer)
   (bind-key "C-M-<left>" 'iflipb-previous-buffer))
+
+;; 行複製
+(defun duplicate-line()
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank)
+)
+(global-set-key (kbd "A-<down>") 'duplicate-line)
 
 (use-package eldoc
   :diminish eldoc-mode)
@@ -628,6 +640,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 		 "** %? \n")
 		("i" "Idea" entry (file+headline "~/Dropbox/org/idea.org" "追記")
 		 "** %? \n")
+		("w" "englishWord" checkitem (file+headline "~/Dropbox/org/english_word.org" "Word")
+		 "- %? \n")
 		)
 	  )
   (setq org-tag-alist '(("Haiku" . ?h) ("School" . ?s)))
@@ -1138,11 +1152,11 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; flymake の拡張
 ;; mac にしたら要調整
 (use-package flymake-diagnostic-at-point
-  :init (add-to-list 'load-path "~/.emacs.d/elpa/flymake-diagnostic-at-point")
+  :ensure t
   :after flymake
   :config
   (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)
-  (setq flymake-diagnostic-at-point-error-prefix " "))
+  (setq flymake-diagnostic-at-point-error-prefix "🧐 "))
 
 
 ;; ivy-xref(動いてない？)
@@ -1172,7 +1186,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :bind (:map eglot-mode-map
   			  ("C-c e n" . eglot-rename))
   :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("/home/hiratako/.local/bin/pylsp")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("/opt/homebrew/Cellar/python-lsp-server/1.7.2/bin/pylsp")))
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("/usr/local/bin/typescript-language-server")))
   )
 
@@ -1190,8 +1204,8 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 ;; 	(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
 ;;   )
 
-;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)
-(use-package lsp-python-ms
+;; lsp-mode(なぜかこれをrequireしないとswiperのエラーが出る)(macだと出なかった)
+;; (use-package lsp-python-ms
   ;; :ensure t
   ;; :init (setq lsp-python-ms-auto-install-server t)
   ;; :hook
@@ -1199,7 +1213,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   ;;                         (require 'lsp-python-ms)
   ;;                         (lsp)))
   ;; (lsp-managed-mode . (lambda () (setq-local company-backends '(company-capf))))
-)
+;; )
 
 
 ;;org-babel
@@ -1490,6 +1504,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 
 ;;neotree（丸パクリ：https://qiita.com/minoruGH/items/2034cad4efe8c5dee4d4）
 (use-package neotree
+  :ensure t
   :init
   (setq-default neo-keymap-style 'concise)
   :config
@@ -1561,7 +1576,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(copilot-idle-delay 2)
  '(custom-safe-themes
    '("b4ba3e1bba2e303265eb3e9753215408e75e031f7c894786ad04cabef46ff94c" "28caf31770f88ffaac6363acfda5627019cac57ea252ceb2d41d98df6d87e240" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" default))
- '(eglot-java-server-install-dir "~/.emacs.d/share/jdt-language-server-1.11.0")
+ '(eglot-java-server-install-dir "/opt/homebrew/Cellar/jdtls/1.21.0/libexec/")
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
  '(ivy-prescient-sort-commands
@@ -1570,7 +1585,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(expand-region region-bindings-mode multiple-cursors eglot-java editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
