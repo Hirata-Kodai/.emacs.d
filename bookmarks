@@ -63,8 +63,8 @@
  (rear-context-string)
  (position . 1))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/org/non_Scheduled_Tasks.org")
- (front-context-string . "** TODO ゆうちょからPa")
- (rear-context-string . "/sale-bic/lines\n")
- (position . 34357))
+ (filename . "~/Dropbox/org/yaritai.org")
+ (front-context-string . "** 感情をあらわすアイコン付き")
+ (rear-context-string . "なことしか投稿できないSNS \n")
+ (position . 6405))
 )
