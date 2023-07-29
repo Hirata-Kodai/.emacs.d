@@ -1189,7 +1189,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   			  ("C-c e n" . eglot-rename))
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("/opt/homebrew/Cellar/python-lsp-server/1.7.2/bin/pylsp")))
-  ;; (add-to-list 'eglot-server-programs '(web-mode . ("/usr/local/bin/typescript-language-server")))
+  (add-to-list 'eglot-server-programs '(web-mode . ("/opt/homebrew/bin/typescript-language-server")))
   )
 
 ;; メモリの使用量がやばいので一旦保留

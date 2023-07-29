@@ -64,7 +64,7 @@
  (position . 1))
 ("org-capture-last-stored"
  (filename . "~/Dropbox/org/yaritai.org")
- (front-context-string . "** 感情をあらわすアイコン付き")
- (rear-context-string . "なことしか投稿できないSNS \n")
- (position . 6405))
+ (front-context-string . "** スキルマップを作成するアプ")
+ (rear-context-string . "アイコン付きのチャットアプリ \n")
+ (position . 6431))
 )
