@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("idea"
+(("meeting"
+ (filename . "~/Dropbox/org/meeting.org")
+ (front-context-string . "* ファイターズ\n** <202")
+ (rear-context-string)
+ (position . 1))
+("idea"
  (filename . "~/Dropbox/org/idea.org")
  (front-context-string . "* 追記\n** 健康診断の結果を")
  (rear-context-string . "りが悪くても30分で一度やめる\n")
@@ -63,8 +68,8 @@
  (rear-context-string)
  (position . 1))
 ("org-capture-last-stored"
- (filename . "~/Dropbox/org/yaritai.org")
- (front-context-string . "** スキルマップを作成するアプ")
- (rear-context-string . "アイコン付きのチャットアプリ \n")
- (position . 6431))
+ (filename . "~/Dropbox/org/english.org")
+ (front-context-string . "- audit\n  - 監査\n*")
+ (rear-context-string . "current\n  - 同時の\n")
+ (position . 29))
 )

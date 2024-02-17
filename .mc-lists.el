@@ -5,6 +5,7 @@
       '(
 		backward-sexp
 		counsel-M-x
+		electric-newline-and-maybe-indent
 		forward-sexp
 		iflipb-next-buffer
 		ivy-switch-buffer

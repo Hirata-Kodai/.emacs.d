@@ -678,7 +678,16 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
 (use-package org-bullets
   :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-;; org ファイルから qiita に投稿できる markdown を生成するパッケージ
+; org ファイルから qiita に投稿できる markdown を生成するパッケージ
+;; コードの書き方
+;;; #+name: .emacs
+;;; #+begin_src emacs-lisp
+;;;   (require 'ox-qmd)
+;;; #+end_src
+;; note 記法
+;;; #+begin_note-info
+;;; ノートの本文
+;;; #+end_note-info
 (use-package ox-qmd
   :config
   (add-to-list 'ox-qmd-language-keyword-alist '(("shell-script" . "sh")
@@ -1188,7 +1197,7 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :bind (:map eglot-mode-map
   			  ("C-c e n" . eglot-rename))
   :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("/opt/homebrew/Cellar/python-lsp-server/1.7.2/bin/pylsp")))
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(web-mode . ("/opt/homebrew/bin/typescript-language-server")))
   )
 
@@ -1421,6 +1430,10 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   :init (doom-modeline-mode 1)
 )
 
+;; (use-package spaceline-all-the-icons 
+;;   :after spaceline
+;;   :config (spaceline-all-the-icons-theme))
+
 ;; nyan-mode
 ;; (use-package nyan-mode
 ;;   :ensure t
@@ -1587,7 +1600,7 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
