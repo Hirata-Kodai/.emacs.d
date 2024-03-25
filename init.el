@@ -457,8 +457,7 @@
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history)
-         :map my-error-map
-         ("e" . consult-flymake))                ;; orig. previous-matching-history-element
+		 )
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -480,10 +479,6 @@
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-
-  (with-eval-after-load 'meow
-    (meow-leader-define-key
-     '("b" . consult-buffer)))
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
@@ -527,9 +522,12 @@
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
   )
 
+(global-set-key (kbd "C-s") 'consult-line)
+
 ;; all-the-icons
 (use-package all-the-icons)
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+(all-the-icons-completion-mode)
 
 ;;migemo
 (use-package migemo
