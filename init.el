@@ -327,7 +327,69 @@
 (setq unkillable-buffers '("^\\*scratch*\\*$" "^\\*dashboard\\*$"))
 (unkillable-scratch 1)
 
+;; vertico
+(use-package vertico
+  :init
+  (setq vertico-cycle t)
+  (vertico-mode +1))
 
+(use-package vertico-repeat
+  :ensure nil
+  :after vertico
+  :hook (minibuffer-setup . vertico-repeat-save))
+
+(use-package vertico-directory
+  :ensure nil
+  :after vertico
+  :bind ( :map vertico-map
+          ("<backspace>" . vertico-directory-delete-char)))
+
+(defvar +vertico-current-arrow t)
+
+(cl-defmethod vertico--format-candidate :around
+  (cand prefix suffix index start &context ((and +vertico-current-arrow
+                                                 (not (bound-and-true-p vertico-flat-mode)))
+                                            (eql t)))
+  (setq cand (cl-call-next-method cand prefix suffix index start))
+  (let ((arrow (all-the-icons-faicon "hand-o-right")))  ;; 
+    (if (bound-and-true-p vertico-grid-mode)
+        (if (= vertico--index index)
+            (concat arrow " " cand)
+          (concat #("_" 0 1 (display " ")) cand))
+      (if (= vertico--index index)
+          (concat " " arrow " " cand)
+        (concat "    " cand)))))
+
+(use-package orderless
+  :config
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides nil)
+
+  (with-eval-after-load 'migemo
+    ;; orderlessをmigemo対応
+    (defun orderless-migemo (component)
+      (let ((pattern (downcase (migemo-get-pattern component))))
+        (condition-case nil
+            (progn (string-match-p pattern "") pattern)
+          (invalid-regexp nil))))
+    (add-to-list 'orderless-matching-styles 'orderless-migemo))
+
+  (with-eval-after-load 'corfu
+    (defun orderless-fast-dispatch (word index total)
+      (and (= index 0) (= total 1) (length< word 4)
+           'orderless-literal-prefix))
+
+    (orderless-define-completion-style orderless-fast
+      (orderless-style-dispatchers '(orderless-fast-dispatch))
+      (orderless-matching-styles '(orderless-flex)))
+
+    (defun my/setup-corfu-for-orderless ()
+      (setq-local corfu-auto-delay 0
+                  corfu-auto-prefix 1
+                  completion-styles '(orderless-fast)))
+
+    (add-hook 'corfu-mode-hook #'my/setup-corfu-for-orderless)))
 ;; prescient
 (when (require 'prescient nil t)
 
@@ -337,6 +399,133 @@
 
   ;; アクティベート
   (prescient-persist-mode 1))
+
+(use-package vertico-prescient
+  :config
+  (setq vertico-prescient-enable-filtering nil)
+  (vertico-prescient-mode +1))
+
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings (mode-specific-map)
+         ("C-c h" . consult-history)
+         ("C-c m" . consult-mode-command)
+         ("C-c k" . consult-kmacro)
+         ;; C-x bindings (ctl-x-map)
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ([remap switch-to-buffer] . consult-buffer)                ;; orig. switch-to-buffer
+         ([remap switch-to-buffer-other-window] . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
+         ([remap project-switch-to-buffer] . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("<help> a" . consult-apropos)            ;; orig. apropos-command
+         :map goto-map
+         ("e" . consult-compile-error)
+         ("f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g" . consult-goto-line)           ;; orig. goto-line
+         ("o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("m" . consult-mark)
+         ("k" . consult-global-mark)
+         ("i" . consult-imenu)
+         ("I" . consult-imenu-multi)
+         :map search-map
+         ("d" . consult-fd)
+         ("D" . consult-locate)
+         ("g" . consult-grep)
+         ("G" . consult-git-grep)
+         ("r" . consult-ripgrep)
+         ("l" . consult-line)
+         ("L" . consult-line-multi)
+         ("m" . consult-multi-occsur)
+         ("k" . consult-keep-lines)
+         ("u" . consult-focus-lines)
+         ("e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-hisstory)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history)
+         :map my-error-map
+         ("e" . consult-flymake))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  (with-eval-after-load 'meow
+    (meow-leader-define-key
+     '("b" . consult-buffer)))
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 1.0 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;; There are multiple reasonable alternatives to chose from.
+    ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+    ;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+    ;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+    ;;;; 4. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+  )
 
 ;; all-the-icons
 (use-package all-the-icons)
@@ -1327,7 +1516,13 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets counsel-tramp iflipb magit nyan-mode dumb-jump company-quickhelp package-utils company-box all-the-icons-dired all-the-icons markdown-preview-mode quickrun company-irony diminish counsel swiper open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(consult orderless vertico-prescient all-the-icons-completion vertico org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets counsel-tramp iflipb magit nyan-mode dumb-jump company-quickhelp package-utils company-box all-the-icons-dired all-the-icons markdown-preview-mode quickrun company-irony diminish counsel swiper open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
 
 (load-theme 'adwaita t)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
