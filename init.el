@@ -328,141 +328,8 @@
 (unkillable-scratch 1)
 
 
-;;ivy
-(use-package ivy
-  :ensure t
-  :init (ivy-mode 1)
-  :diminish ivy-mode
-  :bind
-  ("M-x" . counsel-M-x)
-  ("C-x C-f" . counsel-find-file)
-  ("C-x C-r" . counsel-recentf)
-  ("C-x t" . counsel-tramp)
-  ("C-x r b" . counsel-bookmark)
-  :bind*
-  ("C-c C-r" . ivy-resume)
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-wrap t)
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-initial-inputs-alist
-      '((org-agenda-refile . "^")
-        (org-capture-refile . "^")
-        ;; (counsel-M-x . "^") ;; 削除．必要に応じて他のコマンドも除外する．
-        (Man-completion-table . "^")
-        (woman . "^")))
-  (setf (alist-get 'counsel-M-x ivy-re-builders-alist) #'ivy--regex-ignore-order)
-  
-  ;; (defun isearch-forward-or-swiper (use-swiper)
-  ;;   (interactive "p")
-  ;;   ;; (interactive "P") ;; 大文字のPだと，C-u C-sてでないと効かない
-  ;;   (let (current-prefix-arg)
-  ;;     (call-interactively (if use-swiper 'swiper 'isearch-forward))))
-  ;; Toggle migemo and fuzzy by command.
-  ;; mac にしたら要調整
-  (use-package ivy-migemo
-	:init (add-to-list 'load-path "~/.emacs.d/elpa/ivy-migemo")
-	:config
-	(define-key ivy-minibuffer-map (kbd "M-f") #'ivy-migemo-toggle-fuzzy)
-	(define-key ivy-minibuffer-map (kbd "M-i") #'ivy-migemo-toggle-migemo)
-
-	;; If you want to defaultly use migemo on swiper and counsel-find-file:
-	(setq ivy-re-builders-alist '((t . ivy--regex-plus)
-								  (swiper . ivy-migemo--regex-plus)
-								  (counsel-find-file . ivy-migemo--regex-plus)
-								  (counsel-recentf . ivy-migemo--regex-plus)
-								  (counsel-rg . ivy-migemo--regex-plus))
-  										;(counsel-other-function . ivy-migemo--regex-plus)
-		  )
-	(setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)
-								  (swiper-region . ivy-migemo--regex-fuzzy)
-								  (counsel-find-file . ivy-migemo--regex-fuzzy)
-								  (counsel-recentf . ivy-migemo--regex-fuzzy)
-								  (counsel-rg . ivy-migemo--regex-fuzzy))
-  										;(counsel-other-function . ivy-migemo--regex-fuzzy)
-		  )
-	)
-
-  ;; (use-package swiper-migemo
-  ;; 	:init
-  ;; 	(add-to-list 'load-path "~/.emacs.d/elpa/swiper-migemo")
-  ;; 	:config
-  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-find-file)
-  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-recentf)
-  ;; 	(add-to-list 'swiper-migemo-enable-command 'counsel-rg)
-  ;; 	(setq migemo-options '("--quiet" "--nonewline" "--emacs"))
-  ;; 	(migemo-kill)
-  ;; 	(migemo-init)
-  ;; 	(global-swiper-migemo-mode +1))
-  
-  (defun swiper-region ()
-  "If region is selected `swiper' with the keyword selected in region. If the region isn't selected `swiper'."
-  (interactive)
-  (if (not (use-region-p))
-      (swiper)
-    (deactivate-mark)
-    (swiper (buffer-substring-no-properties
-	     (region-beginning) (region-end)))))
-  (global-set-key (kbd "C-s") 'swiper-region)
-  
-;; ~/から始まるように
-(defun ad:counsel-recentf ()
-   "Find a file on `recentf-list'."
-   (interactive)
-   (require 'recentf)
-   (recentf-mode)
-   (ivy-read "Recentf: "
-			 (progn
-			   (mapcar #'substring-no-properties recentf-list) ;; no need?
-			   (mapcar #'abbreviate-file-name recentf-list)) ;; ~/
-			 :action (lambda (f)
-					   (with-ivy-window
-						 (find-file f)))
-			 :require-match t
-			 :caller 'counsel-recentf))
-(advice-add 'counsel-recentf :override #'ad:counsel-recentf)
-
-:config
-    ;; using ivy-format-fuction-arrow with counsel-yank-pop
-    (advice-add
-    'counsel--yank-pop-format-function
-    :override
-    (lambda (cand-pairs)
-      (ivy--format-function-generic
-       (lambda (str)
-         (mapconcat
-          (lambda (s)
-            (ivy--add-face (concat (propertize "┃ " 'face `(:foreground "#61bfff")) s) 'ivy-current-match))
-          (split-string
-           (counsel--yank-pop-truncate str) "\n" t)
-          "\n"))
-       (lambda (str)
-         (counsel--yank-pop-truncate str))
-       cand-pairs
-       counsel-yank-pop-separator)))
-
-    ;; NOTE: this variable do not work if defined in :custom
-    (setq ivy-format-function 'ivy-format-function-pretty)
-    (setq counsel-yank-pop-separator
-        (propertize "\n────────────────────────────────────────────────────────\n"
-               'face `(:foreground "#6272a4")))
-  )
-
-;; ivyのプロンプトにアイコンを表示
-(with-eval-after-load "ivy"
-  (defun my-pre-prompt-function ()
-    (if window-system
-        (format "%s "
-                (all-the-icons-faicon "linux")) ;; ""
-      (format "%s\n" (make-string (1- (frame-width)) ?\x2D))))
-  (setq ivy-pre-prompt-function #'my-pre-prompt-function))
-
 ;; prescient
 (when (require 'prescient nil t)
-
-  ;; ivy インターフェイスでコマンドを実行するたびに，キャッシュをファイル保存
-  (setq prescient-aggressive-file-save t)
 
   ;; ファイルの保存先
   (setq prescient-save-file
@@ -471,126 +338,9 @@
   ;; アクティベート
   (prescient-persist-mode 1))
 
-(when (require 'ivy-prescient nil t)
-
-  ;; =ivy= の face 情報を引き継ぐ（ただし，完全ではない印象）
-  (setq ivy-prescient-retain-classic-highlighting t)
-
-  ;; コマンドを追加
-  (dolist (command '(counsel-M-x)) ;; add :caller
-    (add-to-list 'ivy-prescient-sort-commands command))
-
-  ;; フィルタの影響範囲を限定する．以下の3つは順番が重要．
-  (ivy-prescient-mode 1)
-  (setq ivy-prescient-enable-filtering nil))
-
 ;; all-the-icons
 (use-package all-the-icons)
-(use-package all-the-icons-ivy
-  :ensure t
-  :config
-  (setq all-the-icons-scale-factor 1.0)
-  (defun all-the-icons-ivy-icon-for-file (s)
-	"Return icon for filename S.
-Return the octicon for directory if S is a directory.
-Otherwise fallback to calling `all-the-icons-icon-for-file'."
-	(cond
-	 ((string-match-p "\\/$" s)
-	  (all-the-icons-octicon "file-directory" :face 'all-the-icons-ivy-dir-face))
-	 (t (all-the-icons-icon-for-file s :v-adjust 0.02))))
-  (defun all-the-icons-ivy--icon-for-mode (mode)
-	"Apply `all-the-icons-for-mode' on MODE but either return an icon or nil."
-	(let ((icon (all-the-icons-icon-for-mode mode :v-adjust 0.02)))
-	  (unless (symbolp icon)
-		icon)))
-  (all-the-icons-ivy-setup)
-
-  ;; ivyのカーソル設定
-  (defface my-ivy-arrow-visible
-  '((((class color) (background light)) :foreground "orange")
-    (((class color) (background dark)) :foreground "#EE6363"))
-  "Face used by Ivy for highlighting the arrow.")
-
-  (defface my-ivy-arrow-invisible
-	'((((class color) (background light)) :foreground "#ededed")
-	  (((class color) (background(defface my-ivy-arrow-invisible
-								   '((((class color) (background light)) :foreground "#ededed")
-									 (((class color) (background dark)) :foreground "#31343F"))
-								   "Face used by Ivy for highlighting the invisible arrow.") dark)) :foreground "#31343F"))
-	"Face used by Ivy for highlighting the invisible arrow.")
-
-  (if window-system
-	  (when (require 'all-the-icons nil t)
-		(defun my-ivy-format-function-arrow (cands)
-		  "Transform CANDS into a string for minibuffer."
-		  (ivy--format-function-generic
-		   (lambda (str)
-			 (concat (all-the-icons-faicon
-					  "hand-o-right"
-					  :v-adjust -0.2 :face 'my-ivy-arrow-visible)
-					 " " (ivy--add-face str 'ivy-current-match)))
-		   (lambda (str)
-			 (concat (all-the-icons-faicon
-					  "hand-o-right" :face 'my-ivy-arrow-invisible) " " str))
-		   cands
-		   "\n"))
-		(setq ivy-format-functions-alist
-			  '((t . my-ivy-format-function-arrow))))
-	(setq ivy-format-functions-alist '((t . ivy-format-function-arrow))))
-
-  ;; ivyのマッチ部分のface (Custom で設定しているからいらない？)
-  ;; (custom-set-faces
-  ;;  '(ivy-current-match
-  ;; 	 ((((class color) (background light))
-  ;; 	   :background "#e0daab" :distant-foreground "#000000")
-  ;; 	  (((class color) (background dark))
-  ;; 	   :background "#404040" :distant-foreground "#abb2bf")))
-  ;;  '(ivy-minibuffer-match-face-1
-  ;; 	 ((((class color) (background light)) :foreground "#666666")
-  ;; 	  (((class color) (background dark)) :foreground "#999999")))
-  ;;  '(ivy-minibuffer-match-face-2
-  ;; 	 ((((class color) (background light)) :foreground "#c03333" :underline t)
-  ;; 	  (((class color) (background dark)) :foreground "#e04444" :underline t)))
-  ;;  '(ivy-minibuffer-match-face-3
-  ;; 	 ((((class color) (background light)) :foreground "#8585ff" :underline t)
-  ;; 	  (((class color) (background dark)) :foreground "#7777ff" :underline t)))
-  ;;  '(ivy-minibuffer-match-face-4
-  ;; 	 ((((class color) (background light)) :foreground "#439943" :underline t)
-  ;; 	  (((class color) (background dark)) :foreground "#33bb33" :underline t))))
-  )
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
-
-(use-package ivy-hydra
-  :ensure t
-  :config
-  (setq ivy-read-action-function #'ivy-hydra-read-action)
-  )
-
-
-;;swiperを日本語にも対応
-(defun my:ivy-migemo-re-builder (str)
-  "Own function for my:ivy-migemo."
-  (let* ((sep " \\|\\^\\|\\.\\|\\*")
-         (splitted (--map (s-join "" it)
-                          (--partition-by (s-matches-p " \\|\\^\\|\\.\\|\\*" it)
-                                          (s-split "" str t)))))
-    (s-join "" (--map (cond ((s-equals? it " ") ".*?")
-                            ((s-matches? sep it) it)
-                            (t (migemo-get-pattern it)))
-                      splitted))))
-
-(setq ivy-re-builders-alist '((t . ivy--regex-plus)
-                              (swiper . my:ivy-migemo-re-builder)
-							  (counsel-rg . my:ivy-migemo-re-builder)
-							  ))
-
-;; If you want to defaultly use migemo on swiper and counsel-find-file:
-;; (setq ivy-re-builders-alist '((t . ivy--regex-plus)
-;;                               (swiper . ivy-migemo--regex-plus)
-;;                               (counsel-find-file . ivy-migemo--regex-plus))
-;;                               ;(counsel-other-function . ivy-migemo--regex-plus)
-;;                               )
 
 ;;migemo
 (use-package migemo
@@ -713,12 +463,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (setq yas-snippet-dirs
 		'("~/.emacs.d/snippets"
 		  "~/.emacs.d/elpa/yasnippet-snippets-20210408.1234/snippets/")))
-
-(use-package ivy-yasnippet
-  :ensure t
-  :after (yasnippet)
-  :bind (("C-c y" . ivy-yasnippet)
-         ("C-c C-y" . ivy-yasnippet)))
 
 ;; Python
 (use-package python
@@ -1169,20 +913,6 @@ Otherwise fallback to calling `all-the-icons-icon-for-file'."
   (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)
   (setq flymake-diagnostic-at-point-error-prefix "🧐 "))
 
-
-;; ivy-xref(動いてない？)
-(use-package ivy-xref
-  :ensure t
-  :config
-  ;; xref initialization is different in Emacs 27 - there are two different
-;; variables which can be set rather than just one
-(when (>= emacs-major-version 27)
-  (setq xref-show-definitions-function #'ivy-xref-show-defs))
-;; Necessary in Emacs <27. In Emacs 27 it will affect all xref-based
-;; commands other than xref-find-definitions (e.g. project-find-regexp)
-;; as well
-(setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
-
 ;;smart jump
 (use-package smart-jump
  :ensure t
@@ -1593,24 +1323,11 @@ The description of ARG is in `neo-buffer--execute'."
  '(eglot-java-server-install-dir "/opt/homebrew/Cellar/jdtls/1.21.0/libexec/")
  '(espotify-client-id "18a882a383ac4a7c9b067444cec1a5e9")
  '(espotify-client-secret "f74c6dd514a2428da821a85611d49a71")
- '(ivy-prescient-sort-commands
-   '(counsel-M-x :not swiper swiper-isearch ivy-switch-buffer swiper-region))
  '(numpydoc-insert-examples-block nil)
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets ivy-migemo ivy-spotify counsel-tramp iflipb magit nyan-mode ivy-xref dumb-jump company-quickhelp package-utils company-box ivy-prescient all-the-icons-dired all-the-icons all-the-icons-ivy markdown-preview-mode ivy-yasnippet quickrun company-irony diminish counsel swiper ivy open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets counsel-tramp iflipb magit nyan-mode dumb-jump company-quickhelp package-utils company-box all-the-icons-dired all-the-icons markdown-preview-mode quickrun company-irony diminish counsel swiper open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
  '(show-paren-style 'parenthesis))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ivy-current-match ((((class color) (background light)) :background "#e0daab" :distant-foreground "#000000") (((class color) (background dark)) :background "#404040" :distant-foreground "#abb2bf")))
- '(ivy-minibuffer-match-face-1 ((((class color) (background light)) :foreground "#666666") (((class color) (background dark)) :foreground "#999999")))
- '(ivy-minibuffer-match-face-2 ((((class color) (background light)) :foreground "#c03333" :underline t) (((class color) (background dark)) :foreground "#e04444" :underline t)))
- '(ivy-minibuffer-match-face-3 ((((class color) (background light)) :foreground "#8585ff" :underline t) (((class color) (background dark)) :foreground "#7777ff" :underline t)))
- '(ivy-minibuffer-match-face-4 ((((class color) (background light)) :foreground "#439943" :underline t) (((class color) (background dark)) :foreground "#33bb33" :underline t))))
-
 
 (load-theme 'adwaita t)
