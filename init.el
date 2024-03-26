@@ -31,6 +31,7 @@
 (setq confirm-kill-processes nil)  ; Stop confirming the killing of processes
 (set-mouse-color "SlateBlue2")
 (mac-auto-ascii-mode 1)  ; C-xやM-x を打った際に英語モードに切り替える
+(setq read-extended-command-predicate #'command-completion-default-include-p)  ; 使用可能なコマンドだけ表示する
 
 ;; scratch buffer を org mode 仕様に
 (setq initial-major-mode 'org-mode)
@@ -368,14 +369,21 @@
   :bind ( :map vertico-map
           ("<backspace>" . vertico-directory-delete-char)))
 
-(defvar +vertico-current-arrow t)
+;; マッチ行のハイライト、カーソル表示の見た目
+(set-face-background 'vertico-current "#e0daab")
+(set-face-foreground 'vertico-current "#5e96bd")
 
+(defvar +vertico-current-arrow t)
+(defface my-ivy-arrow-visible
+  '((((class color) (background light)) :foreground "orange")
+    (((class color) (background dark)) :foreground "#EE6363"))
+  "Face used by Vertico for highlighting the arrow.")
 (cl-defmethod vertico--format-candidate :around
   (cand prefix suffix index start &context ((and +vertico-current-arrow
                                                  (not (bound-and-true-p vertico-flat-mode)))
                                             (eql t)))
   (setq cand (cl-call-next-method cand prefix suffix index start))
-  (let ((arrow (all-the-icons-faicon "hand-o-right")))  ;; 
+  (let ((arrow (all-the-icons-faicon "hand-o-right" :v-adjust -0.2 :face 'my-ivy-arrow-visible)))  ;; 
     (if (bound-and-true-p vertico-grid-mode)
         (if (= vertico--index index)
             (concat arrow " " cand)
