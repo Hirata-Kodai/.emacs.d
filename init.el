@@ -184,6 +184,30 @@
 (use-package eldoc
   :diminish eldoc-mode)
 
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+(use-package which-key-posframe
+  :after which-key
+  :config
+  (which-key-posframe-mode)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-center)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-left-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-right-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-right-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-window-center)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-window-top-left-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-window-top-right-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-window-bottom-left-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-window-bottom-right-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-point-top-left-corner)
+  ;; (setq which-key-posframe-poshandler 'posframe-poshandler-point-bottom-left-corner)
+  )
+
 ;; dired
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
 (setq dired-dwim-target t)
@@ -1117,6 +1141,10 @@
   (add-to-list 'eglot-server-programs '(web-mode . ("/opt/homebrew/bin/typescript-language-server")))
   )
 
+(use-package eglot-booster
+	:after eglot
+	:config	(eglot-booster-mode))
+
 ;; メモリの使用量がやばいので一旦保留
 ;; (use-package copilot
 ;;   :init (add-to-list 'load-path "~/.emacs.d/elpa/copilot.el/")
@@ -1514,7 +1542,9 @@ The description of ARG is in `neo-buffer--execute'."
  '(numpydoc-insertion-style 'yas)
  '(open-junk-file-find-file-function 'find-file)
  '(package-selected-packages
-   '(consult orderless vertico-prescient all-the-icons-completion vertico org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets counsel-tramp iflipb magit nyan-mode dumb-jump company-quickhelp package-utils company-box all-the-icons-dired all-the-icons markdown-preview-mode quickrun company-irony diminish counsel swiper open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+   '(eglot-booster which-key-posframe consult orderless vertico-prescient all-the-icons-completion vertico org-modern nerd-icons-completion spaceline-all-the-icons nano-modeline org-download flymake-diagnostic-at-point dap-mode lsp-java eglot-java expand-region region-bindings-mode multiple-cursors editorconfig poetry numpydoc ox-qmd unkillable-scratch org-bullets docker-compose-mode yaml-mode twittering-mode js2-mode web-mode docker dockerfile-mode tramp company-math vterm dracula-theme poke-line doom-modeline grip-mode smartparens smart-jump eglot lsp-ui lsp-python-ms lsp-mode csv-mode yatex yasnippet-snippets counsel-tramp iflipb magit nyan-mode dumb-jump company-quickhelp package-utils company-box all-the-icons-dired all-the-icons markdown-preview-mode quickrun company-irony diminish counsel swiper open-junk-file use-package mozc migemo helm-core flycheck elscreen elpy))
+ '(package-vc-selected-packages
+   '((eglot-booster :vc-backend Git :url "https://github.com/jdtsmith/eglot-booster")))
  '(show-paren-style 'parenthesis))
 
 (load-theme 'adwaita t)
